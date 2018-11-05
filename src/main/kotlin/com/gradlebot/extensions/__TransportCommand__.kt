@@ -1,6 +1,7 @@
 package com.gradlebot.extensions
 
 import com.gradlebot.auth.CredentialProvider
+import com.gradlebot.jgit.SshTransportConfigCallback
 import com.jcraft.jsch.JSch
 import com.jcraft.jsch.JSchException
 import com.jcraft.jsch.Session
@@ -24,24 +25,4 @@ fun <C : GitCommand<*>?, T> TransportCommand<C, T>.authenticate(credentialProvid
     }
 
     return this
-}
-
-private class SshTransportConfigCallback(val sshPrivateKeyFile: String?, val passphrase: String?)  : TransportConfigCallback {
-    private val sshSessionFactory = object : JschConfigSessionFactory() {
-        override fun configure(hc: OpenSshConfig.Host, session: Session) {
-            session.setConfig("StrictHostKeyChecking", "no")
-        }
-
-        @Throws(JSchException::class)
-        override fun createDefaultJSch(fs: FS): JSch {
-            val jSch = super.createDefaultJSch(fs)
-            jSch.addIdentity(sshPrivateKeyFile, passphrase)
-            return jSch
-        }
-    }
-
-    override fun configure(transport: Transport) {
-        val sshTransport = transport as SshTransport
-        sshTransport.sshSessionFactory = sshSessionFactory
-    }
 }

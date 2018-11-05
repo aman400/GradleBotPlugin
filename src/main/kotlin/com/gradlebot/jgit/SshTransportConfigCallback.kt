@@ -1,28 +1,23 @@
 package com.gradlebot.jgit
 
 import com.jcraft.jsch.JSch
+import com.jcraft.jsch.JSchException
 import com.jcraft.jsch.Session
 import org.eclipse.jgit.api.TransportConfigCallback
 import org.eclipse.jgit.transport.*
 import org.eclipse.jgit.util.FS
 
-class SshTransportConfigCallback(privateSSHFilepath: String?, sshPassphrase: String?) : TransportConfigCallback {
+class SshTransportConfigCallback(val sshPrivateKeyFile: String?, val passphrase: String?)  : TransportConfigCallback {
     private val sshSessionFactory = object : JschConfigSessionFactory() {
         override fun configure(hc: OpenSshConfig.Host, session: Session) {
             session.setConfig("StrictHostKeyChecking", "no")
         }
 
-        override fun createDefaultJSch(fs: FS?): JSch {
-            val defaultJsch = super.createDefaultJSch(fs)
-            if(privateSSHFilepath != null) {
-                if(sshPassphrase != null) {
-                    defaultJsch.addIdentity(privateSSHFilepath, sshPassphrase)
-                } else {
-                    defaultJsch.addIdentity(privateSSHFilepath)
-                }
-            }
-            return defaultJsch
-
+        @Throws(JSchException::class)
+        override fun createDefaultJSch(fs: FS): JSch {
+            val jSch = super.createDefaultJSch(fs)
+            jSch.addIdentity(sshPrivateKeyFile, passphrase)
+            return jSch
         }
     }
 
