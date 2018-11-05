@@ -21,7 +21,8 @@ def groupId = "com.gradlebot"
 def artifactId = "plugin"
 def version = "1.0"
 
-def localReleaseDest = "/Users/aman/Desktop/GradleBot"
+def releaseDest = project.hasProperty('MAVEN_BUILD_PATH') ? MAVEN_BUILD_PATH : ""
+def snapshotDest = project.hasProperty('MAVEN_SNAPSHOT_PATH') ? MAVEN_SNAPSHOT_PATH : ""
 
 def isReleaseBuild() {
     return !VERSION_NAME.contains("SNAPSHOT")
@@ -60,8 +61,8 @@ uploadArchives {
             }
 
             // Add other pom properties here if you want (developer details / licenses)
-            repository(url: "file://${localReleaseDest}")
-            snapshotRepository(url: "file://${localReleaseDest}")
+            repository(url: "file://${releaseDest}")
+            snapshotRepository(url: "file://${snapshotDest}")
         }
     }
 }
