@@ -1,7 +1,7 @@
 package com.gradlebot
 
 import com.gradlebot.auth.CredentialProvider
-import com.gradlebot.extensions.authanticate
+import com.gradlebot.extensions.authenticate
 import org.eclipse.jgit.api.CreateBranchCommand
 import org.eclipse.jgit.api.Git
 import org.eclipse.jgit.api.ListBranchCommand
@@ -32,7 +32,7 @@ open class PullCodeTask @Inject constructor(val credentialProvider: CredentialPr
 
         if (localBranch != null) {
             git.checkout().setName(branchName).setCreateBranch(false).call()
-            if (git.pull().authanticate(credentialProvider).call().isSuccessful) {
+            if (git.pull().authenticate(credentialProvider).call().isSuccessful) {
                 logger.quiet("Pulled latest code")
             }
         } else {
@@ -40,7 +40,7 @@ open class PullCodeTask @Inject constructor(val credentialProvider: CredentialPr
             if (remoteBranch != null) {
                 fetchAndCheckoutRemoteBranch(git, branchName)
             } else {
-                git.fetch().authanticate(credentialProvider).call()
+                git.fetch().authenticate(credentialProvider).call()
                 logger.quiet("Fetched all branches")
                 fetchAndCheckoutRemoteBranch(git, branchName)
             }
@@ -73,7 +73,7 @@ open class PullCodeTask @Inject constructor(val credentialProvider: CredentialPr
     }
 
     private fun pullRemoteCode(git: Git, branchName: String): Boolean {
-        if (git.pull().setRemoteBranchName(branchName).authanticate(credentialProvider).call().isSuccessful) {
+        if (git.pull().setRemoteBranchName(branchName).authenticate(credentialProvider).call().isSuccessful) {
             return true
         }
         return false
