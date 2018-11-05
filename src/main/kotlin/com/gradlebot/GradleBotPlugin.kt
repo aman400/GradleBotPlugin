@@ -1,5 +1,7 @@
 package com.gradlebot
 
+import com.gradlebot.tasks.AssembleWithArgsTask
+import com.gradlebot.tasks.PullCodeTask
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 

@@ -1,4 +1,4 @@
-package com.gradlebot
+package com.gradlebot.tasks
 
 import com.gradlebot.auth.CredentialProvider
 import com.gradlebot.extensions.authenticate
