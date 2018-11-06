@@ -15,7 +15,7 @@ import java.util.concurrent.ExecutionException
 
 fun <C : GitCommand<*>?, T> TransportCommand<C, T>.authenticate(credentialProvider: CredentialProvider) : TransportCommand<C, T> {
     if(credentialProvider.username.isNullOrEmpty() && credentialProvider.sshFilePath.isNullOrEmpty()) {
-        throw ExecutionException(NullPointerException("Either set username and password or setup ssh with following block\ngradlebotConfig {\n    credentials {\n        username = \"<username>\"\n        password = \"<password>\"\n        sshFilePath = \"<ssh file path>\"\n        passphrase = \"passphrase\"\n    }\n}"))
+        throw ExecutionException(NullPointerException("Either set username and password or setup ssh with following block\ngradlebotConfig {\n    credentials {\n        username = \"<username>\"\n        password = \"<password>\"\n        sshFilePath = \"<ssh file path>\"\n        passphrase = \"<passphrase>\"\n    }\n}"))
     }
 
     if(!credentialProvider.username.isNullOrEmpty()) {
