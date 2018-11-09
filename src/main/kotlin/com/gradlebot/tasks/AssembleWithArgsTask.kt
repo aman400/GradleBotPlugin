@@ -54,7 +54,6 @@ open class AssembleWithArgsTask : DefaultTask() {
             project.copy {
                 val sourceDir =
                     File("$androidBuildDir/outputs/apk/${config?.flavour?.let { "${config?.flavour}/" } ?: ""}${config?.buildType}/")
-                println(sourceDir.path)
                 it.from(sourceDir) { copySpec ->
                     copySpec.include("*.apk")
 
@@ -70,7 +69,7 @@ open class AssembleWithArgsTask : DefaultTask() {
                     } == null) {
                     throw ExecutionException(NullPointerException("Invalid buildType or flavour"))
                 }
-                print("Moved file from ${sourceDir.path} to ${config?.destinationPath!!}")
+                println("Moved file from ${sourceDir.path} to ${config?.destinationPath!!}")
             }
         } else {
             println("destination path or buildType is missing")
