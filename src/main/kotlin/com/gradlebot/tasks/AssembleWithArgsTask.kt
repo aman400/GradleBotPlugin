@@ -1,6 +1,7 @@
 package com.gradlebot.tasks
 
 import com.gradlebot.auth.CredentialProvider
+import com.gradlebot.extensions.isAndroidProject
 import com.gradlebot.models.Config
 import org.gradle.api.DefaultTask
 import org.gradle.api.Project
@@ -19,6 +20,7 @@ import java.util.concurrent.ExecutionException
 open class AssembleWithArgsTask : DefaultTask() {
     lateinit var credentialProvider: CredentialProvider
     lateinit var pullCodeTask: PullCodeTask
+    lateinit var cleanOutputTask: CleanOutputTask
     var config: Config? = null
 
     @Internal
@@ -30,15 +32,15 @@ open class AssembleWithArgsTask : DefaultTask() {
         if (hasSubProjects) {
             project.subprojects.forEach { subProject ->
                 subProject.afterEvaluate {
-                    if (isAndroidApplication(it)) {
+                    if (it.isAndroidProject()) {
                         androidBuildDir = it.project.buildDir.path
                         val assembleTask = it.tasks.findByName(BasePlugin.ASSEMBLE_TASK_NAME)
-                        val cleanTask = it.tasks.findByPath(BasePlugin.CLEAN_TASK_NAME)
+//                        val cleanTask = it.tasks.findByPath(BasePlugin.CLEAN_TASK_NAME)
                         dependsOn(assembleTask)
-                        dependsOn(cleanTask)
+                        dependsOn(cleanOutputTask)
                         dependsOn(pullCodeTask)
-                        cleanTask?.mustRunAfter(pullCodeTask)
-                        assembleTask?.mustRunAfter(cleanTask)
+                        cleanOutputTask.mustRunAfter(pullCodeTask)
+                        assembleTask?.mustRunAfter(cleanOutputTask)
 
                     }
                 }
@@ -47,28 +49,21 @@ open class AssembleWithArgsTask : DefaultTask() {
     }
 
     @TaskAction
-    fun helloWorld() {
-//        def buildType = project.hasProperty('BUILD_TYPE') ? BUILD_TYPE : DEFAULT_BUILD_TYPE
-//        def flavourType = project.hasProperty('FLAVOUR') ? FLAVOUR : null
-//        def path = ""
-//
-//        if (flavourType != null) {
-//            path = path + "${flavourType}/"
-//        }
-//
-//        path = path + "${buildType}/"
-//        from file(path)
-//        include "*.apk"
-//        into file(destination_path)
-//        if (fileTree(path).files.size() == 0) throw new GradleException("Invalid BUILD_TYPE or FLAVOUR")
-//        println "Moving files from ${path} to ${destination_path}"
+    fun assemble() {
         if (config != null && config?.destinationPath != null && config?.buildType != null) {
             project.copy {
                 val sourceDir =
                     File("$androidBuildDir/outputs/apk/${config?.flavour?.let { "${config?.flavour}/" } ?: ""}${config?.buildType}/")
                 println(sourceDir.path)
-                it.from(sourceDir)
-                it.include("*.apk")
+                it.from(sourceDir) { copySpec ->
+                    copySpec.include("*.apk")
+
+                    config?.filePrefix?.let { filePrefix ->
+                        copySpec.rename { filename ->
+                            "$filePrefix-${filename.substringAfter("-")}"
+                        }
+                    }
+                }
                 it.into(File(config?.destinationPath!!))
                 if (sourceDir.listFiles() == null || sourceDir.listFiles().firstOrNull { file ->
                         file.name.contains("apk")
@@ -88,9 +83,5 @@ open class AssembleWithArgsTask : DefaultTask() {
 
     override fun getDescription(): String? {
         return "Pass command line arguments to assemble task of android"
-    }
-
-    private fun isAndroidApplication(project: Project): Boolean {
-        return project.plugins.hasPlugin("com.android.application")
     }
 }

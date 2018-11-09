@@ -5,4 +5,5 @@ open class Config {
     var branch: String? = null
     var flavour: String? = null
     var destinationPath: String? = null
+    var filePrefix: String? = null
 }

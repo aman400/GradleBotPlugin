@@ -1,6 +1,7 @@
 package com.gradlebot
 
 import com.gradlebot.tasks.AssembleWithArgsTask
+import com.gradlebot.tasks.CleanOutputTask
 import com.gradlebot.tasks.PullCodeTask
 import org.gradle.api.Plugin
 import org.gradle.api.Project
@@ -18,10 +19,13 @@ open class GradleBotPlugin : Plugin<Project> {
                 it.credentialProvider = extension.credentials
                 it.config = extension.config
             }
-            val assembleWithArgsTask = create("assembleWithArgs", AssembleWithArgsTask::class.java) {
+            val cleanOutputTask = create("cleanOutput", CleanOutputTask::class.java)
+
+            create("assembleWithArgs", AssembleWithArgsTask::class.java) {
                 it.credentialProvider = extension.credentials
                 it.pullCodeTask = pullCodeTask
                 it.config = extension.config
+                it.cleanOutputTask = cleanOutputTask
             }
         }
     }
