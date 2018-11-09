@@ -35,7 +35,6 @@ open class AssembleWithArgsTask : DefaultTask() {
                     if (it.isAndroidProject()) {
                         androidBuildDir = it.project.buildDir.path
                         val assembleTask = it.tasks.findByName(BasePlugin.ASSEMBLE_TASK_NAME)
-//                        val cleanTask = it.tasks.findByPath(BasePlugin.CLEAN_TASK_NAME)
                         dependsOn(assembleTask)
                         dependsOn(cleanOutputTask)
                         dependsOn(pullCodeTask)
@@ -50,6 +49,7 @@ open class AssembleWithArgsTask : DefaultTask() {
 
     @TaskAction
     fun assemble() {
+        // Move the assembled Apk
         if (config != null && config?.destinationPath != null && config?.buildType != null) {
             project.copy {
                 val sourceDir =
@@ -82,6 +82,6 @@ open class AssembleWithArgsTask : DefaultTask() {
     }
 
     override fun getDescription(): String? {
-        return "Pass command line arguments to assemble task of android"
+        return "Clean, Assemble, Build and Move APK to give path"
     }
 }

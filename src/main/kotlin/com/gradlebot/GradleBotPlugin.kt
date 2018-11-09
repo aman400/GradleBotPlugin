@@ -8,8 +8,6 @@ import org.gradle.api.Project
 
 open class GradleBotPlugin : Plugin<Project> {
     override fun apply(project: Project) {
-//        if (project.plugins.findPlugin("com.android.application") == null) {
-//        }
         val extension = project.extensions.run {
             create("bot", GradleBotExtension::class.java, project)
         }
