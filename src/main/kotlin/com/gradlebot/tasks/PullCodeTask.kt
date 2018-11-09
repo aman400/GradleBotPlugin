@@ -17,50 +17,48 @@ import java.io.File
 import javax.inject.Inject
 
 open class PullCodeTask : DefaultTask() {
-    var credentialProvider: CredentialProvider = project.objects.newInstance(CredentialProvider::class.java)
+    var credentialProvider: CredentialProvider? = null
 
     var config: Config? = null
     private lateinit var repository: Repository
 
-    fun credentials(action: Action<CredentialProvider>) {
-        action.execute(credentialProvider)
-    }
-
     @TaskAction
     fun pullCode() {
-        config?.branch?.let { branchName ->
-            val repositoryBuilder = FileRepositoryBuilder()
-            repositoryBuilder.isMustExist = true
-            repositoryBuilder.gitDir = File("${project.projectDir}${File.separator}.git")
-            repository = repositoryBuilder.build()
-            val git = Git(repository)
+        credentialProvider?.let { credentials ->
+            config?.branch?.let { branchName ->
+                val repositoryBuilder = FileRepositoryBuilder()
+                repositoryBuilder.isMustExist = true
+                repositoryBuilder.gitDir = File("${project.projectDir}${File.separator}.git")
+                repository = repositoryBuilder.build()
+                val git = Git(repository)
 
-            val localBranch = git.branchList().call().firstOrNull {
-                it.name.substringAfter("refs/heads/") == branchName
-            }
-
-            if (localBranch != null) {
-                git.checkout().setName(branchName).setCreateBranch(false).call()
-                if (git.pull().authenticate(credentialProvider).call().isSuccessful) {
-                    logger.quiet("Pulled latest code")
+                val localBranch = git.branchList().call().firstOrNull {
+                    it.name.substringAfter("refs/heads/") == branchName
                 }
-            } else {
-                val remoteBranch = findRemoteBranch(git, branchName)
-                if (remoteBranch != null) {
-                    fetchAndCheckoutRemoteBranch(git, branchName)
+
+                if (localBranch != null) {
+                    git.checkout().setName(branchName).setCreateBranch(false).call()
+                    if (git.pull().authenticate(credentials).call().isSuccessful) {
+                        logger.quiet("Pulled latest code")
+                    }
                 } else {
-                    git.fetch().authenticate(credentialProvider).call()
-                    logger.quiet("Fetched all branches")
-                    fetchAndCheckoutRemoteBranch(git, branchName)
+                    val remoteBranch = findRemoteBranch(git, branchName)
+                    if (remoteBranch != null) {
+                        fetchAndCheckoutRemoteBranch(git, branchName, credentials)
+                    } else {
+                        git.fetch().authenticate(credentials).call()
+                        logger.quiet("Fetched all branches")
+                        fetchAndCheckoutRemoteBranch(git, branchName, credentials)
+                    }
                 }
-            }
-        } ?: println("BRANCH not specified")
+            } ?: println("BRANCH not specified")
+        }
     }
 
-    private fun fetchAndCheckoutRemoteBranch(git: Git, branchName: String) {
+    private fun fetchAndCheckoutRemoteBranch(git: Git, branchName: String, credentialProvider: CredentialProvider) {
         checkoutRemoteBranch(git, branchName)
 
-        if (pullRemoteCode(git, branchName)) {
+        if (pullRemoteCode(git, branchName, credentialProvider)) {
             logger.quiet("Pulled latest code from remote branch")
         } else {
             logger.quiet("Unable to pull latest code from branch")
@@ -82,7 +80,7 @@ open class PullCodeTask : DefaultTask() {
             .call()
     }
 
-    private fun pullRemoteCode(git: Git, branchName: String): Boolean {
+    private fun pullRemoteCode(git: Git, branchName: String, credentialProvider: CredentialProvider): Boolean {
         if (git.pull().setRemoteBranchName(branchName).authenticate(credentialProvider).call().isSuccessful) {
             return true
         }

@@ -40,7 +40,6 @@ open class AssembleWithArgsTask : DefaultTask() {
                         dependsOn(pullCodeTask)
                         cleanOutputTask.mustRunAfter(pullCodeTask)
                         assembleTask?.mustRunAfter(cleanOutputTask)
-
                     }
                 }
             }

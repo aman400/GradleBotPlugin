@@ -2,6 +2,7 @@ package com.gradlebot
 
 import com.gradlebot.tasks.AssembleWithArgsTask
 import com.gradlebot.tasks.CleanOutputTask
+import com.gradlebot.tasks.FetchRemoteBranchesTask
 import com.gradlebot.tasks.PullCodeTask
 import org.gradle.api.Plugin
 import org.gradle.api.Project
@@ -13,6 +14,9 @@ open class GradleBotPlugin : Plugin<Project> {
         }
 
         with(project.tasks) {
+            create("fetchRemoteBranches", FetchRemoteBranchesTask::class.java) {
+                it.config = extension.config
+            }
             val pullCodeTask = create("pullCode", PullCodeTask::class.java) {
                 it.credentialProvider = extension.credentials
                 it.config = extension.config

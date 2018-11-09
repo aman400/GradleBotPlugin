@@ -6,4 +6,5 @@ open class Config {
     var flavour: String? = null
     var destinationPath: String? = null
     var filePrefix: String? = null
+    var separator: String = "<========>"
 }
