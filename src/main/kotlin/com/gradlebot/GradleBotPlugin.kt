@@ -15,42 +15,14 @@ open class GradleBotPlugin : Plugin<Project> {
         }
 
         with(project.tasks) {
-            val assembleWithArgsTask = create("assembleWithArgs", AssembleWithArgsTask::class.java) {
-                it.credentialProvider = extension.credentialProvider
-            }
-
             val pullCodeTask = create("pullCode", PullCodeTask::class.java) {
                 it.credentialProvider = extension.credentialProvider
                 it.branch = extension.branch
             }
-
-            val hasSubProjects = project.subprojects.size > 0
-
-            if (hasSubProjects) {
-                project.subprojects.forEach { subProject ->
-                    subProject.afterEvaluate {
-                        println("Evaluation done $it")
-                        if(isAndroidApplication(it)) {
-                            it.tasks.forEach {
-                                println(it.name)
-                            }
-                            val assembleTask = it.tasks.findByName(BasePlugin.ASSEMBLE_TASK_NAME)
-                            val cleanTask = it.tasks.findByPath(BasePlugin.CLEAN_TASK_NAME)
-                            println(assembleTask?.name)
-                            println(cleanTask?.name)
-                            assembleWithArgsTask.dependsOn(assembleTask)
-                            assembleWithArgsTask.dependsOn(cleanTask)
-                            assembleWithArgsTask.dependsOn(pullCodeTask)
-                            cleanTask?.mustRunAfter(pullCodeTask)
-                            assembleWithArgsTask.finalizedBy(assembleTask)
-                        }
-                    }
-                }
+            val assembleWithArgsTask = create("assembleWithArgs", AssembleWithArgsTask::class.java) {
+                it.credentialProvider = extension.credentialProvider
+                it.pullCodeTask = pullCodeTask
             }
         }
-    }
-
-    private fun isAndroidApplication(project: Project) : Boolean {
-        return project.plugins.hasPlugin("com.android.application")
     }
 }
