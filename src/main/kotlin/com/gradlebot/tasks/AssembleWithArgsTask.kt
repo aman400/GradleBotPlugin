@@ -2,17 +2,17 @@ package com.gradlebot.tasks
 
 import com.gradlebot.auth.CredentialProvider
 import org.gradle.api.DefaultTask
+import org.gradle.api.Task
 import org.gradle.api.tasks.CacheableTask
 import org.gradle.api.tasks.TaskAction
-import javax.inject.Inject
 
 @CacheableTask
-open class AssembleWithArgsTask @Inject constructor(private val credentialProvider: CredentialProvider) : DefaultTask() {
+open class AssembleWithArgsTask: DefaultTask() {
+    lateinit var credentialProvider: CredentialProvider
 
     @TaskAction
     fun helloWorld() {
-        println(credentialProvider.username)
-
+        println(credentialProvider.passphrase)
     }
 
     override fun getGroup(): String? {
@@ -21,11 +21,5 @@ open class AssembleWithArgsTask @Inject constructor(private val credentialProvid
 
     override fun getDescription(): String? {
         return "Pass command line arguments to assemble task of android"
-    }
-
-    override fun getDependsOn(): MutableSet<Any> {
-        val dependsOn = super.getDependsOn()
-        dependsOn.add(project.tasks.getByName("clean"))
-        return dependsOn
     }
 }
