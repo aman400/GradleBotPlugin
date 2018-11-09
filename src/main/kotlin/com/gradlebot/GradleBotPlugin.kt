@@ -4,24 +4,24 @@ import com.gradlebot.tasks.AssembleWithArgsTask
 import com.gradlebot.tasks.PullCodeTask
 import org.gradle.api.Plugin
 import org.gradle.api.Project
-import org.gradle.api.plugins.BasePlugin
 
 open class GradleBotPlugin : Plugin<Project> {
     override fun apply(project: Project) {
 //        if (project.plugins.findPlugin("com.android.application") == null) {
 //        }
         val extension = project.extensions.run {
-            create("gradlebotConfig", GradleBotExtension::class.java, project)
+            create("bot", GradleBotExtension::class.java, project)
         }
 
         with(project.tasks) {
             val pullCodeTask = create("pullCode", PullCodeTask::class.java) {
-                it.credentialProvider = extension.credentialProvider
-                it.branch = extension.branch
+                it.credentialProvider = extension.credentials
+                it.config = extension.config
             }
             val assembleWithArgsTask = create("assembleWithArgs", AssembleWithArgsTask::class.java) {
-                it.credentialProvider = extension.credentialProvider
+                it.credentialProvider = extension.credentials
                 it.pullCodeTask = pullCodeTask
+                it.config = extension.config
             }
         }
     }

@@ -2,6 +2,7 @@ package com.gradlebot.tasks
 
 import com.gradlebot.auth.CredentialProvider
 import com.gradlebot.extensions.authenticate
+import com.gradlebot.models.Config
 import org.eclipse.jgit.api.CreateBranchCommand
 import org.eclipse.jgit.api.Git
 import org.eclipse.jgit.api.ListBranchCommand
@@ -18,7 +19,7 @@ import javax.inject.Inject
 open class PullCodeTask : DefaultTask() {
     var credentialProvider: CredentialProvider = project.objects.newInstance(CredentialProvider::class.java)
 
-    var branch: Property<String?>? = project.objects.property(String::class.java)
+    var config: Config? = null
     private lateinit var repository: Repository
 
     fun credentials(action: Action<CredentialProvider>) {
@@ -27,7 +28,7 @@ open class PullCodeTask : DefaultTask() {
 
     @TaskAction
     fun pullCode() {
-        branch?.get()?.let { branchName ->
+        config?.branch?.let { branchName ->
             val repositoryBuilder = FileRepositoryBuilder()
             repositoryBuilder.isMustExist = true
             repositoryBuilder.gitDir = File("${project.projectDir}${File.separator}.git")
