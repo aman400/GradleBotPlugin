@@ -34,6 +34,9 @@ bot {
         
         // This prefix will be appended to app name before copying to destination directory
         filePrefix = GENERATED_APP_NAME_PREFIX // (Optional) 
+        
+        // Set git remote repo
+        remote = REMOTE_REPO // Default is 'origin'
     }
 }
 ```
