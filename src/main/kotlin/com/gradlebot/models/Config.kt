@@ -7,4 +7,5 @@ open class Config {
     var destinationPath: String? = null
     var filePrefix: String? = null
     var separator: String = "<========>"
+    var origin: String = "origin"
 }

@@ -30,10 +30,12 @@ open class CleanOutputTask : DefaultTask() {
         File("$buildDir/outputs/apk").deleteDirectory()
     }
 
+    @Input
     override fun getGroup(): String? {
         return "Clean"
     }
 
+    @Input
     override fun getDescription(): String? {
         return "Clean output apk directory for Android Project"
     }

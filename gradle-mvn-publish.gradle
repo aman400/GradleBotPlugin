@@ -17,12 +17,9 @@
 apply plugin: 'maven'
 apply plugin: 'signing'
 
-def groupId = "com.gradlebot"
-def artifactId = "plugin"
-def version = "1.0"
-
-def releaseDest = project.hasProperty('MAVEN_BUILD_PATH') ? MAVEN_BUILD_PATH : ""
-def snapshotDest = project.hasProperty('MAVEN_SNAPSHOT_PATH') ? MAVEN_SNAPSHOT_PATH : ""
+def groupId = GROUP
+def artifactId = POM_ARTIFACT_ID
+def version = VERSION_NAME
 
 def isReleaseBuild() {
     return !VERSION_NAME.contains("SNAPSHOT")
@@ -30,22 +27,13 @@ def isReleaseBuild() {
 
 def getReleaseRepositoryUrl() {
     return hasProperty('RELEASE_REPOSITORY_URL') ? RELEASE_REPOSITORY_URL
-            : "https://oss.sonatype.org/service/local/staging/deploy/maven2/"
+            : ""
 }
 
 def getSnapshotRepositoryUrl() {
     return hasProperty('SNAPSHOT_REPOSITORY_URL') ? SNAPSHOT_REPOSITORY_URL
-            : "https://oss.sonatype.org/content/repositories/snapshots/"
+            : ""
 }
-
-def getRepositoryUsername() {
-    return hasProperty('NEXUS_USERNAME') ? NEXUS_USERNAME : ""
-}
-
-def getRepositoryPassword() {
-    return hasProperty('NEXUS_PASSWORD') ? NEXUS_PASSWORD : ""
-}
-
 
 uploadArchives {
     repositories {
@@ -61,8 +49,8 @@ uploadArchives {
             }
 
             // Add other pom properties here if you want (developer details / licenses)
-            repository(url: "file://${releaseDest}")
-            snapshotRepository(url: "file://${snapshotDest}")
+            repository(url: "file://${getReleaseRepositoryUrl()}")
+            snapshotRepository(url: "file://${getSnapshotRepositoryUrl()}")
         }
     }
 }

@@ -6,10 +6,12 @@ import com.gradlebot.extensions.isAndroidProject
 import com.gradlebot.models.Config
 import org.gradle.api.DefaultTask
 import org.gradle.api.NamedDomainObjectContainer
+import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.TaskAction
 
 open class ProductFlavoursTask: DefaultTask() {
     private var productFlavours: NamedDomainObjectContainer<CoreProductFlavor>? = null
+    @Input
     var config: Config? = null
 
     init {
@@ -34,5 +36,15 @@ open class ProductFlavoursTask: DefaultTask() {
             println(it.name)
         }
         println(config?.separator)
+    }
+
+    @Input
+    override fun getGroup(): String? {
+        return "Config"
+    }
+
+    @Input
+    override fun getDescription(): String? {
+        return "Get all the Android project build flavours"
     }
 }

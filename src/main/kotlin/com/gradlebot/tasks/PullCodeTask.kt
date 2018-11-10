@@ -12,20 +12,25 @@ import org.eclipse.jgit.storage.file.FileRepositoryBuilder
 import org.gradle.api.Action
 import org.gradle.api.DefaultTask
 import org.gradle.api.provider.Property
+import org.gradle.api.tasks.Input
+import org.gradle.api.tasks.Internal
 import org.gradle.api.tasks.TaskAction
 import java.io.File
 import javax.inject.Inject
 
 open class PullCodeTask : DefaultTask() {
+    @Input
     var credentialProvider: CredentialProvider? = null
 
+    @Input
     var config: Config? = null
+    @Internal
     private lateinit var repository: Repository
 
     @TaskAction
     fun pullCode() {
         credentialProvider?.let { credentials ->
-            config?.branch?.let { branchName ->
+            config?.let { config ->
                 val repositoryBuilder = FileRepositoryBuilder()
                 repositoryBuilder.isMustExist = true
                 repositoryBuilder.gitDir = File("${project.projectDir}${File.separator}.git")
@@ -33,50 +38,50 @@ open class PullCodeTask : DefaultTask() {
                 val git = Git(repository)
 
                 val localBranch = git.branchList().call().firstOrNull {
-                    it.name.substringAfter("refs/heads/") == branchName
+                    it.name.substringAfter("refs/heads/") == config.branch
                 }
 
                 if (localBranch != null) {
-                    git.checkout().setName(branchName).setCreateBranch(false).call()
+                    git.checkout().setName(config.branch).setCreateBranch(false).call()
                     if (git.pull().authenticate(credentials).call().isSuccessful) {
                         logger.quiet("Pulled latest code")
                     }
                 } else {
-                    val remoteBranch = findRemoteBranch(git, branchName)
+                    val remoteBranch = findRemoteBranch(git, config)
                     if (remoteBranch != null) {
-                        fetchAndCheckoutRemoteBranch(git, branchName, credentials)
+                        fetchAndCheckoutRemoteBranch(git, config, credentials)
                     } else {
                         git.fetch().authenticate(credentials).call()
                         logger.quiet("Fetched all branches")
-                        fetchAndCheckoutRemoteBranch(git, branchName, credentials)
+                        fetchAndCheckoutRemoteBranch(git, config, credentials)
                     }
                 }
             } ?: println("BRANCH not specified")
         }
     }
 
-    private fun fetchAndCheckoutRemoteBranch(git: Git, branchName: String, credentialProvider: CredentialProvider) {
-        checkoutRemoteBranch(git, branchName)
+    private fun fetchAndCheckoutRemoteBranch(git: Git, config: Config, credentialProvider: CredentialProvider) {
+        checkoutRemoteBranch(git, config)
 
-        if (pullRemoteCode(git, branchName, credentialProvider)) {
+        if (pullRemoteCode(git, config.branch!!, credentialProvider)) {
             logger.quiet("Pulled latest code from remote branch")
         } else {
             logger.quiet("Unable to pull latest code from branch")
         }
     }
 
-    private fun findRemoteBranch(git: Git, branchName: String): Ref? {
+    private fun findRemoteBranch(git: Git, config: Config): Ref? {
         return git.branchList().setListMode(ListBranchCommand.ListMode.REMOTE).call().firstOrNull {
-            it.name.substringAfter("refs/remotes/origin/") == branchName
+            it.name.substringAfter("refs/remotes/${config.origin}/") == config.branch
         }
     }
 
-    private fun checkoutRemoteBranch(git: Git, branchName: String) {
+    private fun checkoutRemoteBranch(git: Git, config: Config) {
         git.checkout()
-            .setName(branchName)
+            .setName(config.branch)
             .setCreateBranch(true)
             .setUpstreamMode(CreateBranchCommand.SetupUpstreamMode.TRACK)
-            .setStartPoint("origin/$branchName")
+            .setStartPoint("${config.origin}/${config.branch}")
             .call()
     }
 
@@ -87,10 +92,12 @@ open class PullCodeTask : DefaultTask() {
         return false
     }
 
+    @Input
     override fun getGroup(): String? {
         return "VCS"
     }
 
+    @Input
     override fun getDescription(): String? {
         return "Pull latest code from github"
     }
