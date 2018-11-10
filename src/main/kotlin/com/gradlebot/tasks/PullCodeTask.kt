@@ -72,7 +72,7 @@ open class PullCodeTask : DefaultTask() {
 
     private fun findRemoteBranch(git: Git, config: Config): Ref? {
         return git.branchList().setListMode(ListBranchCommand.ListMode.REMOTE).call().firstOrNull {
-            it.name.substringAfter("refs/remotes/${config.origin}/") == config.branch
+            it.name.substringAfter("refs/remotes/${config.remote}/") == config.branch
         }
     }
 
@@ -81,7 +81,7 @@ open class PullCodeTask : DefaultTask() {
             .setName(config.branch)
             .setCreateBranch(true)
             .setUpstreamMode(CreateBranchCommand.SetupUpstreamMode.TRACK)
-            .setStartPoint("${config.origin}/${config.branch}")
+            .setStartPoint("${config.remote}/${config.branch}")
             .call()
     }
 
