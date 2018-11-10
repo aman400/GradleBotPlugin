@@ -1,21 +1,37 @@
 package com.gradlebot
 
-import com.gradlebot.tasks.AssembleWithArgsTask
-import com.gradlebot.tasks.PullCodeTask
+import com.gradlebot.tasks.*
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 
 open class GradleBotPlugin : Plugin<Project> {
     override fun apply(project: Project) {
-//        if (project.plugins.findPlugin("com.android.application") == null) {
-//        }
         val extension = project.extensions.run {
-            create("gradlebotConfig", GradleBotExtension::class.java, project.objects)
+            create("bot", GradleBotExtension::class.java, project)
         }
-        with(project.tasks) {
-            create("assembleWithArgs", AssembleWithArgsTask::class.java, extension.credentialProvider)
 
-            create("pullCode", PullCodeTask::class.java, extension.credentialProvider)
+        with(project.tasks) {
+            create("getBuildVariants", BuildVariantsTask::class.java) {
+                it.config = extension.config
+            }
+            create("getProductFlavours", ProductFlavoursTask::class.java) {
+                it.config = extension.config
+            }
+            create("fetchRemoteBranches", FetchRemoteBranchesTask::class.java) {
+                it.config = extension.config
+            }
+            val pullCodeTask = create("pullCode", PullCodeTask::class.java) {
+                it.credentialProvider = extension.credentials
+                it.config = extension.config
+            }
+            val cleanOutputTask = create("cleanOutput", CleanOutputTask::class.java)
+
+            create("assembleWithArgs", AssembleWithArgsTask::class.java) {
+                it.credentialProvider = extension.credentials
+                it.pullCodeTask = pullCodeTask
+                it.config = extension.config
+                it.cleanOutputTask = cleanOutputTask
+            }
         }
     }
 }

@@ -5,10 +5,15 @@ plugins {
     java
     `java-gradle-plugin`
     kotlin("jvm") version "1.3.0"
+    id("com.gradle.plugin-publish") version "0.10.0"
 }
 
-group = "gradlebotplugin"
-version = "1.0-SNAPSHOT"
+val POM_ARTIFACT_ID: String by project
+val GROUP: String by project
+val POM_NAME: String by project
+val POM_DESCRIPTION: String by project
+val POM_URL: String by project
+val POM_SCM_URL: String by project
 
 repositories {
     mavenCentral()
@@ -25,11 +30,20 @@ dependencies {
 
 gradlePlugin {
     plugins {
-        create("gradle-bot-plugin") {
-            id = "com.gradlebot"
+        create(POM_ARTIFACT_ID) {
+            id = GROUP
+            displayName = POM_NAME
+            description = POM_DESCRIPTION
             implementationClass = "com.gradlebot.GradleBotPlugin"
         }
     }
+}
+
+pluginBundle {
+    website = POM_URL
+    vcsUrl = POM_SCM_URL
+    tags = listOf("custom Build Automation", "gradlebot", "build",
+        "Android", "slackbot", "build Automation")
 }
 
 configure<JavaPluginConvention> {
