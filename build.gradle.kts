@@ -42,8 +42,8 @@ gradlePlugin {
 pluginBundle {
     website = POM_URL
     vcsUrl = POM_SCM_URL
-    tags = listOf("custom Build Automation", "gradlebot", "build",
-        "Android", "slackbot", "build Automation")
+    tags = listOf("Custom Build Automation", "gradlebot", "build",
+        "Android", "Build Automation")
 }
 
 configure<JavaPluginConvention> {
