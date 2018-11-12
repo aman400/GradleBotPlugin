@@ -14,10 +14,13 @@ val POM_NAME: String by project
 val POM_DESCRIPTION: String by project
 val POM_URL: String by project
 val POM_SCM_URL: String by project
+val VERSION_NAME: String by project
 
 repositories {
     mavenCentral()
 }
+
+version = VERSION_NAME
 
 dependencies {
     compile(localGroovy())
