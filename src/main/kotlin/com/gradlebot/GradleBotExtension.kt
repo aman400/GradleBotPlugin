@@ -6,7 +6,7 @@ import org.gradle.api.Action
 import org.gradle.api.Project
 import javax.inject.Inject
 
-open class GradleBotExtension @Inject constructor(project: Project) {
+open class GradleBotExtension @Inject constructor(val project: Project) {
     val credentials: CredentialProvider = project.objects.newInstance(CredentialProvider::class.java)
     val config: Config = project.objects.newInstance(Config::class.java)
 

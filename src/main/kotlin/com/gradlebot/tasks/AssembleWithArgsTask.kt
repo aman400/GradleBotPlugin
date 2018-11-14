@@ -1,13 +1,13 @@
 package com.gradlebot.tasks
 
 import com.gradlebot.auth.CredentialProvider
-import com.gradlebot.extensions.isAndroidProject
 import com.gradlebot.models.Config
-import org.gradle.api.Project
 import org.gradle.api.plugins.BasePlugin
-import org.gradle.api.tasks.*
+import org.gradle.api.tasks.CacheableTask
+import org.gradle.api.tasks.Input
+import org.gradle.api.tasks.Internal
+import org.gradle.api.tasks.TaskAction
 import java.io.File
-import java.lang.NullPointerException
 import java.util.concurrent.ExecutionException
 
 @CacheableTask
@@ -63,14 +63,28 @@ open class AssembleWithArgsTask : BaseAndroidTask() {
     }
 
     override fun evaluateTask() {
-        androidProject?.let {
-            androidBuildDir = it.buildDir.path
-            val assembleTask = it.tasks.findByName(BasePlugin.ASSEMBLE_TASK_NAME)
-            dependsOn(assembleTask)
-            dependsOn(cleanOutputTask)
-            dependsOn(pullCodeTask)
-            cleanOutputTask.mustRunAfter(pullCodeTask)
-            assembleTask?.mustRunAfter(cleanOutputTask)
+        if(config?.buildType != null) {
+            val assembleTaskName =
+                "${BasePlugin.ASSEMBLE_TASK_NAME}${config?.flavour?.capitalize() ?: ""}${config?.buildType?.capitalize() ?: ""}"
+            val buildTaskName =
+                "${BasePlugin.BUILD_GROUP}${config?.flavour?.capitalize() ?: ""}${config?.buildType?.capitalize() ?: ""}"
+
+            androidProject?.let {
+                androidBuildDir = it.buildDir.path
+                val assembleTask = it.tasks.findByName(assembleTaskName)
+                val buildTask = it.tasks.find { task ->
+                    task.name.contains(buildTaskName)
+                }
+
+                dependsOn(buildTask)
+                dependsOn(assembleTask)
+                dependsOn(cleanOutputTask)
+                dependsOn(pullCodeTask)
+
+                cleanOutputTask.mustRunAfter(pullCodeTask)
+                buildTask?.mustRunAfter(cleanOutputTask)
+                assembleTask?.mustRunAfter(buildTask)
+            }
         }
     }
 }

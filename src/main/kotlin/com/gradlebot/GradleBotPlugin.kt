@@ -17,13 +17,11 @@ open class GradleBotPlugin : Plugin<Project> {
 
         if(hasAndroidProject) {
             with(project.tasks) {
-                create("getBuildVariants", BuildVariantsTask::class.java) {
+                val buildVariantsTask = create("getBuildVariants", BuildVariantsTask::class.java) {
                     it.config = extension.config
-                    it.evaluateTask()
                 }
-                create("getProductFlavours", ProductFlavoursTask::class.java) {
+                val flavoursTask = create("getProductFlavours", ProductFlavoursTask::class.java) {
                     it.config = extension.config
-                    it.evaluateTask()
                 }
                 create("fetchRemoteBranches", FetchRemoteBranchesTask::class.java) {
                     it.config = extension.config
@@ -32,16 +30,20 @@ open class GradleBotPlugin : Plugin<Project> {
                     it.credentialProvider = extension.credentials
                     it.config = extension.config
                 }
-                val cleanOutputTask = create("cleanOutput", CleanOutputTask::class.java) {
-                    it.evaluateTask()
-                }
+                val cleanOutputTask = create("cleanOutput", CleanOutputTask::class.java)
 
-                create("assembleWithArgs", AssembleWithArgsTask::class.java) {
+                val assembleWithArgsTask = create("assembleWithArgs", AssembleWithArgsTask::class.java) {
                     it.credentialProvider = extension.credentials
                     it.pullCodeTask = pullCodeTask
                     it.config = extension.config
                     it.cleanOutputTask = cleanOutputTask
-                    it.evaluateTask()
+                }
+
+                project.afterEvaluate {
+                    buildVariantsTask.evaluateTask()
+                    flavoursTask.evaluateTask()
+                    cleanOutputTask.evaluateTask()
+                    assembleWithArgsTask.evaluateTask()
                 }
             }
         }
