@@ -3,18 +3,17 @@ package com.gradlebot.tasks
 import com.gradlebot.auth.CredentialProvider
 import com.gradlebot.extensions.isAndroidProject
 import com.gradlebot.models.Config
-import org.gradle.api.DefaultTask
 import org.gradle.api.Project
-import org.gradle.api.Task
 import org.gradle.api.plugins.BasePlugin
-import org.gradle.api.provider.Property
 import org.gradle.api.tasks.*
 import java.io.File
 import java.lang.NullPointerException
 import java.util.concurrent.ExecutionException
 
 @CacheableTask
-open class AssembleWithArgsTask : DefaultTask() {
+open class AssembleWithArgsTask : BaseAndroidTask() {
+    private var androidBuildDir: String? = null
+
     @Input
     lateinit var credentialProvider: CredentialProvider
     @Internal
@@ -23,29 +22,6 @@ open class AssembleWithArgsTask : DefaultTask() {
     lateinit var cleanOutputTask: CleanOutputTask
     @Input
     var config: Config? = null
-
-    @Input
-    var androidBuildDir: String? = null
-
-    init {
-        val hasSubProjects = project.subprojects.size > 0
-
-        if (hasSubProjects) {
-            project.subprojects.forEach { subProject ->
-                subProject.afterEvaluate {
-                    if (it.isAndroidProject()) {
-                        androidBuildDir = it.project.buildDir.path
-                        val assembleTask = it.tasks.findByName(BasePlugin.ASSEMBLE_TASK_NAME)
-                        dependsOn(assembleTask)
-                        dependsOn(cleanOutputTask)
-                        dependsOn(pullCodeTask)
-                        cleanOutputTask.mustRunAfter(pullCodeTask)
-                        assembleTask?.mustRunAfter(cleanOutputTask)
-                    }
-                }
-            }
-        }
-    }
 
     @TaskAction
     fun assemble() {
@@ -84,5 +60,17 @@ open class AssembleWithArgsTask : DefaultTask() {
     @Input
     override fun getDescription(): String? {
         return "Clean, Assemble, Build and Move APK to give path"
+    }
+
+    override fun evaluateTask() {
+        androidProject?.let {
+            androidBuildDir = it.buildDir.path
+            val assembleTask = it.tasks.findByName(BasePlugin.ASSEMBLE_TASK_NAME)
+            dependsOn(assembleTask)
+            dependsOn(cleanOutputTask)
+            dependsOn(pullCodeTask)
+            cleanOutputTask.mustRunAfter(pullCodeTask)
+            assembleTask?.mustRunAfter(cleanOutputTask)
+        }
     }
 }

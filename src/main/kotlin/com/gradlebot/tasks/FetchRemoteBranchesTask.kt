@@ -19,7 +19,7 @@ open class FetchRemoteBranchesTask : DefaultTask() {
     fun fetchRemoteBranches() {
         val repositoryBuilder = FileRepositoryBuilder()
         repositoryBuilder.isMustExist = true
-        repositoryBuilder.gitDir = File("${project.projectDir}${File.separator}.git")
+        repositoryBuilder.gitDir = File("${project.rootDir}${File.separator}.git")
         repository = repositoryBuilder.build()
         val git = Git(repository)
         val branches = git.branchList().setListMode(ListBranchCommand.ListMode.REMOTE).call()

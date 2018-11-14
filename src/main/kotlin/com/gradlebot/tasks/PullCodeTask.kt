@@ -24,7 +24,7 @@ open class PullCodeTask : DefaultTask() {
 
     @Input
     var config: Config? = null
-    @Internal
+
     private lateinit var repository: Repository
 
     @TaskAction
@@ -33,7 +33,7 @@ open class PullCodeTask : DefaultTask() {
             config?.let { config ->
                 val repositoryBuilder = FileRepositoryBuilder()
                 repositoryBuilder.isMustExist = true
-                repositoryBuilder.gitDir = File("${project.projectDir}${File.separator}.git")
+                repositoryBuilder.gitDir = File("${project.rootDir}${File.separator}.git")
                 repository = repositoryBuilder.build()
                 val git = Git(repository)
 
