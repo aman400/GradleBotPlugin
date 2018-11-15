@@ -15,7 +15,7 @@ open class CleanOutputTask : BaseAndroidTask() {
     @TaskAction
     fun clean() {
         buildDirs.forEach {
-            println("deleting $it/outputs/")
+            logger.debug("deleting $it/outputs/")
             File("$it/outputs/").deleteDirectory()
         }
     }

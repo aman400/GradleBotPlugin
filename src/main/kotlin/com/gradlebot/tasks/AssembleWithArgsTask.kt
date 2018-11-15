@@ -53,10 +53,10 @@ open class AssembleWithArgsTask : BaseAndroidTask() {
                     } == null) {
                     throw ExecutionException(NullPointerException("Invalid buildType or flavour"))
                 }
-                println("Moved file from ${sourceDir.path} to ${config?.destinationPath!!}")
+                logger.debug("Moved file from ${sourceDir.path} to ${config?.destinationPath!!}")
             }
         } else {
-            println("destination path is missing")
+            logger.warn("destination path is missing")
         }
     }
 

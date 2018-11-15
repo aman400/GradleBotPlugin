@@ -19,7 +19,7 @@ open class ProductFlavoursTask: BaseAndroidTask() {
 
     @TaskAction
     fun flavours() {
-        println("Product Flavours")
+        logger.info("Product Flavours")
         println(config?.separator)
         productFlavours?.forEach {
             println(it.name)

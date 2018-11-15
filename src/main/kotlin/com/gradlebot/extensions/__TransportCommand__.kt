@@ -5,7 +5,6 @@ import com.gradlebot.jgit.SshTransportConfigCallback
 import org.eclipse.jgit.api.GitCommand
 import org.eclipse.jgit.api.TransportCommand
 import org.eclipse.jgit.transport.UsernamePasswordCredentialsProvider
-import java.util.concurrent.ExecutionException
 
 fun <C : GitCommand<*>?, T> TransportCommand<C, T>.authenticate(credentialProvider: CredentialProvider) : TransportCommand<C, T> {
     if(!credentialProvider.isPresent()) {
