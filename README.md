@@ -71,7 +71,7 @@ bot {
 }
 ```
 
-`bot.credentials` block is to specify the authentication for github repo. Either you can specify username and password authentication or you can use ssh.
+`bot.credentials` block is to specify the authentication for github repo. Either you can specify username and password authentication or you can use SSH(specify `bot.credentials.passphrase` if any).
 
 `bot.config.branch` is to specify the branch to checkout to.
 
