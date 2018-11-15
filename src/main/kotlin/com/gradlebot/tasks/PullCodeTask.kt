@@ -30,33 +30,37 @@ open class PullCodeTask : DefaultTask() {
     @TaskAction
     fun pullCode() {
         credentialProvider?.let { credentials ->
-            config?.let { config ->
-                val repositoryBuilder = FileRepositoryBuilder()
-                repositoryBuilder.isMustExist = true
-                repositoryBuilder.gitDir = File("${project.rootDir}${File.separator}.git")
-                repository = repositoryBuilder.build()
-                val git = Git(repository)
+            if(credentials.isPresent()) {
+                config?.let { config ->
+                    val repositoryBuilder = FileRepositoryBuilder()
+                    repositoryBuilder.isMustExist = true
+                    repositoryBuilder.gitDir = File("${project.rootDir}${File.separator}.git")
+                    repository = repositoryBuilder.build()
+                    val git = Git(repository)
 
-                val localBranch = git.branchList().call().firstOrNull {
-                    it.name.substringAfter("refs/heads/") == config.branch
-                }
-
-                if (localBranch != null) {
-                    git.checkout().setName(config.branch).setCreateBranch(false).call()
-                    if (git.pull().authenticate(credentials).call().isSuccessful) {
-                        logger.quiet("Pulled latest code")
+                    val localBranch = git.branchList().call().firstOrNull {
+                        it.name.substringAfter("refs/heads/") == config.branch
                     }
-                } else {
-                    val remoteBranch = findRemoteBranch(git, config)
-                    if (remoteBranch != null) {
-                        fetchAndCheckoutRemoteBranch(git, config, credentials)
+
+                    if (localBranch != null) {
+                        git.checkout().setName(config.branch).setCreateBranch(false).call()
+                        if (git.pull().authenticate(credentials).call().isSuccessful) {
+                            logger.quiet("Pulled latest code")
+                        }
                     } else {
-                        git.fetch().authenticate(credentials).call()
-                        logger.quiet("Fetched all branches")
-                        fetchAndCheckoutRemoteBranch(git, config, credentials)
+                        val remoteBranch = findRemoteBranch(git, config)
+                        if (remoteBranch != null) {
+                            fetchAndCheckoutRemoteBranch(git, config, credentials)
+                        } else {
+                            git.fetch().authenticate(credentials).call()
+                            logger.quiet("Fetched all branches")
+                            fetchAndCheckoutRemoteBranch(git, config, credentials)
+                        }
                     }
-                }
-            } ?: println("BRANCH not specified")
+                } ?: println("BRANCH not specified")
+            } else {
+                println("Either set username and password or setup ssh with following block\nbot {\n    credentials {\n        username = \"<username>\"\n        password = \"<password>\"\n        sshFilePath = \"<ssh file path>\"\n        passphrase = \"<passphrase>\"\n    }\n}")
+            }
         }
     }
 

@@ -8,10 +8,12 @@ import org.gradle.api.DefaultTask
 import org.gradle.api.NamedDomainObjectContainer
 import org.gradle.api.Project
 import org.gradle.api.tasks.Input
+import org.gradle.api.tasks.Internal
 import org.gradle.api.tasks.TaskAction
 
 open class ProductFlavoursTask: BaseAndroidTask() {
-    private var productFlavours: NamedDomainObjectContainer<CoreProductFlavor>? = null
+    @Internal
+    var productFlavours: NamedDomainObjectContainer<CoreProductFlavor>? = null
     @Input
     var config: Config? = null
 

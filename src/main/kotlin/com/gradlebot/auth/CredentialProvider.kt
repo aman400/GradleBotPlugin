@@ -5,4 +5,8 @@ open class CredentialProvider {
     var passphrase: String? = null
     var username: String? = null
     var password: String? = null
+
+    fun isPresent(): Boolean {
+        return !username.isNullOrEmpty() || !sshFilePath.isNullOrEmpty()
+    }
 }

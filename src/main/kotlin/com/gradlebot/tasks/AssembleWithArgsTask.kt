@@ -14,6 +14,11 @@ import java.util.concurrent.ExecutionException
 open class AssembleWithArgsTask : BaseAndroidTask() {
     private var androidBuildDir: String? = null
 
+    @Internal
+    var defaultProductFlavour: String? = null
+    @Internal
+    var defaultBuildType: String? = null
+
     @Input
     lateinit var credentialProvider: CredentialProvider
     @Internal
@@ -25,11 +30,14 @@ open class AssembleWithArgsTask : BaseAndroidTask() {
 
     @TaskAction
     fun assemble() {
+        val buildType = config?.buildType ?: defaultBuildType
+        val flavour = config?.flavour ?: defaultProductFlavour
         // Move the assembled Apk
-        if (config != null && config?.destinationPath != null && config?.buildType != null) {
+        if (config != null && config?.destinationPath != null) {
             project.copy {
                 val sourceDir =
-                    File("$androidBuildDir/outputs/apk/${config?.flavour?.let { "${config?.flavour}/" } ?: ""}${config?.buildType}/")
+                    File("$androidBuildDir/outputs/apk/${flavour?.let { "$flavour/" }
+                        ?: ""}${buildType?.let { "$buildType/" } ?: ""}")
                 it.from(sourceDir) { copySpec ->
                     copySpec.include("*.apk")
 
@@ -48,7 +56,7 @@ open class AssembleWithArgsTask : BaseAndroidTask() {
                 println("Moved file from ${sourceDir.path} to ${config?.destinationPath!!}")
             }
         } else {
-            println("destination path or buildType is missing")
+            println("destination path is missing")
         }
     }
 
@@ -63,28 +71,28 @@ open class AssembleWithArgsTask : BaseAndroidTask() {
     }
 
     override fun evaluateTask() {
-        if(config?.buildType != null) {
-            val assembleTaskName =
-                "${BasePlugin.ASSEMBLE_TASK_NAME}${config?.flavour?.capitalize() ?: ""}${config?.buildType?.capitalize() ?: ""}"
-            val buildTaskName =
-                "${BasePlugin.BUILD_GROUP}${config?.flavour?.capitalize() ?: ""}${config?.buildType?.capitalize() ?: ""}"
+        val assembleTaskName =
+            "${BasePlugin.ASSEMBLE_TASK_NAME}${config?.flavour?.capitalize() ?: (defaultProductFlavour?.capitalize()
+                ?: "")}${config?.buildType?.capitalize() ?: (defaultBuildType?.capitalize() ?: "")}"
+        val buildTaskName =
+            "${BasePlugin.BUILD_GROUP}${config?.flavour?.capitalize() ?: (defaultProductFlavour?.capitalize()
+                ?: "")}${config?.buildType?.capitalize() ?: (defaultBuildType?.capitalize() ?: "")}"
 
-            androidProject?.let {
-                androidBuildDir = it.buildDir.path
-                val assembleTask = it.tasks.findByName(assembleTaskName)
-                val buildTask = it.tasks.find { task ->
-                    task.name.contains(buildTaskName)
-                }
-
-                dependsOn(buildTask)
-                dependsOn(assembleTask)
-                dependsOn(cleanOutputTask)
-                dependsOn(pullCodeTask)
-
-                cleanOutputTask.mustRunAfter(pullCodeTask)
-                buildTask?.mustRunAfter(cleanOutputTask)
-                assembleTask?.mustRunAfter(buildTask)
+        androidProject?.let {
+            androidBuildDir = it.buildDir.path
+            val assembleTask = it.tasks.findByName(assembleTaskName)
+            val buildTask = it.tasks.find { task ->
+                task.name.contains(buildTaskName)
             }
+
+            dependsOn(buildTask)
+            dependsOn(assembleTask)
+            dependsOn(cleanOutputTask)
+            dependsOn(pullCodeTask)
+
+            cleanOutputTask.mustRunAfter(pullCodeTask)
+            buildTask?.mustRunAfter(cleanOutputTask)
+            assembleTask?.mustRunAfter(buildTask)
         }
     }
 }
