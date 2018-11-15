@@ -44,8 +44,8 @@ open class GradleBotPlugin : Plugin<Project> {
                     flavoursTask.evaluateTask()
                     cleanOutputTask.evaluateTask()
 
-                    assembleWithArgsTask.defaultBuildType = buildVariantsTask.buildTypes?.first()?.name
-                    assembleWithArgsTask.defaultProductFlavour = flavoursTask.productFlavours?.first()?.name
+                    assembleWithArgsTask.defaultBuildType = buildVariantsTask.buildTypes?.firstOrNull()?.name
+                    assembleWithArgsTask.defaultProductFlavour = flavoursTask.productFlavours?.firstOrNull()?.name
                     assembleWithArgsTask.evaluateTask()
                 }
             }
