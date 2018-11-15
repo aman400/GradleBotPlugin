@@ -73,17 +73,17 @@ bot {
 
 `bot.credentials` block is to specify the authentication for github repo. Either you can specify username and password authentication or you can use SSH(specify `bot.credentials.passphrase` if any).
 
-`bot.config.branch` is to specify the branch to checkout to.
+`bot.config.branch` config is to specify the branch to checkout to.
 
-`bot.config.destinationPath` is to specify the destination path to copy generate APK to.
+`bot.config.destinationPath` config is to specify the destination path to copy generate APK to.
 
-`bot.config.buildType` is to specify any android build you want to build.
+`bot.config.buildType` config is to specify any android build you want to build.
 
-`bot.config.flavour` is to specify android build flavour you want to build.
+`bot.config.flavour` config is to specify android build flavour you want to build.
 
-`bot.config.filePrefix` is to append prefix to generated APK.
+`bot.config.filePrefix` config is to prepend prefix to generated APK.
 
-`bot.config.remote` is to set the git remote. Default is `origin`.
+`bot.config.remote` config is to set the git remote. Default is `origin`.
 
 ## Tasks and usage
 
@@ -103,7 +103,7 @@ bot {
 ./gradlew fetchRemoteBranches
 ```
 
-**assembleWithArgs** Task depends upon `pullCode`, `cleanOutput` and `assemble` generates APK and move generated APK to given destination.
+**assembleWithArgs** Task depends upon `pullCode`, `cleanOutput` and `assemble` tasks. It generates APK according to specified config and move generated APK to given destination.
 ```bash
 ./gradlew assembleWithArgs
 ```
