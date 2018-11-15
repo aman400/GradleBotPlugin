@@ -5,11 +5,13 @@ import com.android.build.gradle.internal.dsl.BuildType
 import com.gradlebot.models.Config
 import org.gradle.api.NamedDomainObjectContainer
 import org.gradle.api.tasks.Input
+import org.gradle.api.tasks.Internal
 import org.gradle.api.tasks.TaskAction
 
 open class BuildVariantsTask : BaseAndroidTask() {
 
-    private var buildTypes: NamedDomainObjectContainer<BuildType>? = null
+    @Internal
+    var buildTypes: NamedDomainObjectContainer<BuildType>? = null
     @Input
     var config: Config? = null
 

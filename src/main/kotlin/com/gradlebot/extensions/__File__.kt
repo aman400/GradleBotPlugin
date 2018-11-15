@@ -6,8 +6,9 @@ fun File.deleteDirectory() {
     if(this.exists()) {
         if(this.isDirectory) {
             this.listFiles().forEach {
-                it.delete()
+                it.deleteDirectory()
             }
+            this.delete()
         } else {
             this.delete()
         }

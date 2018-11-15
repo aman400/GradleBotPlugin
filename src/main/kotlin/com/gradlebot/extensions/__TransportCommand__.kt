@@ -5,11 +5,10 @@ import com.gradlebot.jgit.SshTransportConfigCallback
 import org.eclipse.jgit.api.GitCommand
 import org.eclipse.jgit.api.TransportCommand
 import org.eclipse.jgit.transport.UsernamePasswordCredentialsProvider
-import java.util.concurrent.ExecutionException
 
 fun <C : GitCommand<*>?, T> TransportCommand<C, T>.authenticate(credentialProvider: CredentialProvider) : TransportCommand<C, T> {
-    if(credentialProvider.username.isNullOrEmpty() && credentialProvider.sshFilePath.isNullOrEmpty()) {
-        throw ExecutionException(NullPointerException("Either set username and password or setup ssh with following block\nbot {\n    credentials {\n        username = \"<username>\"\n        password = \"<password>\"\n        sshFilePath = \"<ssh file path>\"\n        passphrase = \"<passphrase>\"\n    }\n}"))
+    if(!credentialProvider.isPresent()) {
+        println("Either set username and password or setup ssh with following block\nbot {\n    credentials {\n        username = \"<username>\"\n        password = \"<password>\"\n        sshFilePath = \"<ssh file path>\"\n        passphrase = \"<passphrase>\"\n    }\n}")
     }
 
     if(!credentialProvider.username.isNullOrEmpty()) {

@@ -17,6 +17,7 @@ import org.gradle.api.tasks.Internal
 import org.gradle.api.tasks.TaskAction
 import java.io.File
 import javax.inject.Inject
+import kotlin.math.log
 
 open class PullCodeTask : DefaultTask() {
     @Input
@@ -30,33 +31,41 @@ open class PullCodeTask : DefaultTask() {
     @TaskAction
     fun pullCode() {
         credentialProvider?.let { credentials ->
-            config?.let { config ->
-                val repositoryBuilder = FileRepositoryBuilder()
-                repositoryBuilder.isMustExist = true
-                repositoryBuilder.gitDir = File("${project.rootDir}${File.separator}.git")
-                repository = repositoryBuilder.build()
-                val git = Git(repository)
+            if (credentials.isPresent()) {
+                if (!config?.branch.isNullOrEmpty()) {
+                    config?.let { config ->
+                        val repositoryBuilder = FileRepositoryBuilder()
+                        repositoryBuilder.isMustExist = true
+                        repositoryBuilder.gitDir = File("${project.rootDir}${File.separator}.git")
+                        repository = repositoryBuilder.build()
+                        val git = Git(repository)
 
-                val localBranch = git.branchList().call().firstOrNull {
-                    it.name.substringAfter("refs/heads/") == config.branch
-                }
+                        val localBranch = git.branchList().call().firstOrNull {
+                            it.name.substringAfter("refs/heads/") == config.branch
+                        }
 
-                if (localBranch != null) {
-                    git.checkout().setName(config.branch).setCreateBranch(false).call()
-                    if (git.pull().authenticate(credentials).call().isSuccessful) {
-                        logger.quiet("Pulled latest code")
-                    }
+                        if (localBranch != null) {
+                            git.checkout().setName(config.branch).setCreateBranch(false).call()
+                            if (git.pull().authenticate(credentials).call().isSuccessful) {
+                                logger.quiet("Pulled latest code")
+                            }
+                        } else {
+                            val remoteBranch = findRemoteBranch(git, config)
+                            if (remoteBranch != null) {
+                                fetchAndCheckoutRemoteBranch(git, config, credentials)
+                            } else {
+                                git.fetch().authenticate(credentials).call()
+                                logger.quiet("Fetched all branches")
+                                fetchAndCheckoutRemoteBranch(git, config, credentials)
+                            }
+                        }
+                    } ?: logger.warn("branch not specified")
                 } else {
-                    val remoteBranch = findRemoteBranch(git, config)
-                    if (remoteBranch != null) {
-                        fetchAndCheckoutRemoteBranch(git, config, credentials)
-                    } else {
-                        git.fetch().authenticate(credentials).call()
-                        logger.quiet("Fetched all branches")
-                        fetchAndCheckoutRemoteBranch(git, config, credentials)
-                    }
+                    logger.warn("branch not specified")
                 }
-            } ?: println("BRANCH not specified")
+            } else {
+                logger.warn("Either set username and password or setup ssh with following block\nbot {\n    credentials {\n        username = \"<username>\"\n        password = \"<password>\"\n        sshFilePath = \"<ssh file path>\"\n        passphrase = \"<passphrase>\"\n    }\n}")
+            }
         }
     }
 
