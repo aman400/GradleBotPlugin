@@ -1,5 +1,6 @@
 package com.gradlebot.tasks
 
+import com.gradlebot.extensions.initGit
 import com.gradlebot.models.Config
 import org.eclipse.jgit.api.Git
 import org.eclipse.jgit.api.ListBranchCommand
@@ -13,20 +14,17 @@ import java.io.File
 open class FetchRemoteBranchesTask : DefaultTask() {
     @Input
     var config: Config? = null
-    private lateinit var repository: Repository
 
     @TaskAction
     fun fetchRemoteBranches() {
-        val repositoryBuilder = FileRepositoryBuilder()
-        repositoryBuilder.isMustExist = true
-        repositoryBuilder.gitDir = File("${project.rootDir}${File.separator}.git")
-        repository = repositoryBuilder.build()
-        val git = Git(repository)
-        val branches = git.branchList().setListMode(ListBranchCommand.ListMode.REMOTE).call()
-        println(config?.separator)
-        branches.forEach {
-            println(it.name)
+        with(project.initGit()) {
+            val branches = branchList().setListMode(ListBranchCommand.ListMode.REMOTE).call()
+            println(config?.separator)
+            branches.forEach {
+                println(it.name)
+            }
+            println(config?.separator)
+            close()
         }
-        println(config?.separator)
     }
 }
