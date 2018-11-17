@@ -29,7 +29,7 @@ buildscript {
     }
   }
   dependencies {
-    classpath "gradle.plugin.com.github.aman400.gradlebot:gradlebot:0.1-beta01"
+    classpath "gradle.plugin.com.github.aman400.gradlebot:gradlebot:0.1-beta03"
   }
 }
 
