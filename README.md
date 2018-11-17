@@ -16,7 +16,7 @@ generate the APK and copy the generated APK to your specified directory in ```bo
 For Gradle version 2.1 and later:
 ```groovy
 plugins {
-  id "com.github.aman400.gradlebot" version "0.1-beta01"
+  id "com.github.aman400.gradlebot" version "0.1-beta03"
 }
 ```
 
