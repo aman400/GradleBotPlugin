@@ -25,6 +25,7 @@ open class GradleBotPlugin : Plugin<Project> {
                 }
                 create("fetchRemoteBranches", FetchRemoteBranchesTask::class.java) {
                     it.config = extension.config
+                    it.credentials = extension.credentials
                 }
                 val pullCodeTask = create("pullCode", PullCodeTask::class.java) {
                     it.credentialProvider = extension.credentials

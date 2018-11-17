@@ -2,23 +2,15 @@ package com.gradlebot.tasks
 
 import com.gradlebot.auth.CredentialProvider
 import com.gradlebot.extensions.authenticate
-import com.gradlebot.extensions.initGit
+import com.gradlebot.extensions.initRepository
 import com.gradlebot.models.Config
 import org.eclipse.jgit.api.CreateBranchCommand
 import org.eclipse.jgit.api.Git
 import org.eclipse.jgit.api.ListBranchCommand
 import org.eclipse.jgit.lib.Ref
-import org.eclipse.jgit.lib.Repository
-import org.eclipse.jgit.storage.file.FileRepositoryBuilder
-import org.gradle.api.Action
 import org.gradle.api.DefaultTask
-import org.gradle.api.provider.Property
 import org.gradle.api.tasks.Input
-import org.gradle.api.tasks.Internal
 import org.gradle.api.tasks.TaskAction
-import java.io.File
-import javax.inject.Inject
-import kotlin.math.log
 
 open class PullCodeTask : DefaultTask() {
     @Input
@@ -33,27 +25,35 @@ open class PullCodeTask : DefaultTask() {
             if (credentials.isPresent()) {
                 if (!config?.branch.isNullOrEmpty()) {
                     config?.let { config ->
-                        with(project.initGit()) {
-                            val localBranch = branchList().call().firstOrNull {
+                        Git(project.initRepository()).use { git ->
+
+                            git.fetch().setCheckFetchedObjects(true)
+                                .setRemoveDeletedRefs(true)
+                                .authenticate(credentials).call()
+                            logger.quiet("Fetched all branches")
+
+                            val localBranch = git.branchList().call().filter {
                                 it.name.substringAfter("refs/heads/") == config.branch
-                            }
+                            }.map {
+                                it.name.substringAfter("refs/heads/")
+                            }.firstOrNull()
 
                             if (localBranch != null) {
-                                checkout().setName(config.branch).setCreateBranch(false).call()
-                                if (pull().authenticate(credentials).call().isSuccessful) {
+                                git.checkout().setName(config.branch).setCreateBranch(false).call()
+                                if (git.pull().authenticate(credentials).call().isSuccessful) {
                                     logger.quiet("Pulled latest code")
                                 }
                             } else {
-                                val remoteBranch = findRemoteBranch(this, config)
+                                val remoteBranch = git.branchList().setListMode(ListBranchCommand.ListMode.REMOTE).call().filter {
+                                    it.name.substringAfter("refs/remotes/${config.remote}/") == config.branch
+                                }.map {
+                                    it.name.substringAfter("refs/remotes/${config.remote}/")
+                                }.firstOrNull()
+
                                 if (remoteBranch != null) {
-                                    fetchAndCheckoutRemoteBranch(this, config, credentials)
-                                } else {
-                                    fetch().authenticate(credentials).call()
-                                    logger.quiet("Fetched all branches")
-                                    fetchAndCheckoutRemoteBranch(this, config, credentials)
+                                    fetchAndCheckoutRemoteBranch(git, config, credentials)
                                 }
                             }
-                            close()
                         }
                     } ?: logger.warn("branch not specified")
                 } else {
@@ -72,12 +72,6 @@ open class PullCodeTask : DefaultTask() {
             logger.quiet("Pulled latest code from remote branch")
         } else {
             logger.quiet("Unable to pull latest code from branch")
-        }
-    }
-
-    private fun findRemoteBranch(git: Git, config: Config): Ref? {
-        return git.branchList().setListMode(ListBranchCommand.ListMode.REMOTE).call().firstOrNull {
-            it.name.substringAfter("refs/remotes/${config.remote}/") == config.branch
         }
     }
 

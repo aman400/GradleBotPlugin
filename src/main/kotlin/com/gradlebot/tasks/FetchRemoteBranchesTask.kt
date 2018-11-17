@@ -1,30 +1,38 @@
 package com.gradlebot.tasks
 
-import com.gradlebot.extensions.initGit
+import com.gradlebot.auth.CredentialProvider
+import com.gradlebot.extensions.authenticate
+import com.gradlebot.extensions.initRepository
 import com.gradlebot.models.Config
 import org.eclipse.jgit.api.Git
 import org.eclipse.jgit.api.ListBranchCommand
-import org.eclipse.jgit.lib.Repository
-import org.eclipse.jgit.storage.file.FileRepositoryBuilder
 import org.gradle.api.DefaultTask
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.TaskAction
-import java.io.File
 
 open class FetchRemoteBranchesTask : DefaultTask() {
     @Input
     var config: Config? = null
 
+    @Input
+    var credentials: CredentialProvider? = null
+
     @TaskAction
     fun fetchRemoteBranches() {
-        with(project.initGit()) {
-            val branches = branchList().setListMode(ListBranchCommand.ListMode.REMOTE).call()
-            println(config?.separator)
-            branches.forEach {
-                println(it.name)
+        credentials?.let {credentialProvider ->
+            Git(project.initRepository()).use { git ->
+                git.fetch().setRemoveDeletedRefs(true).authenticate(credentialProvider).call()
+                val branches = git.branchList().setListMode(ListBranchCommand.ListMode.REMOTE).call()
+                println(config?.separator)
+                branches.map {
+                    it.name.substringAfter("refs/remotes/${config?.remote}/")
+                }.filter {
+                    it != "HEAD"
+                }.forEach {
+                    println(it)
+                }
+                println(config?.separator)
             }
-            println(config?.separator)
-            close()
         }
     }
 }

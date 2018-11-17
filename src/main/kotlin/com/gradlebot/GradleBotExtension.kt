@@ -16,5 +16,7 @@ open class GradleBotExtension @Inject constructor(val project: Project) {
 
     fun config(action: Action<Config>) {
         action.execute(config)
+        if (config.remote == null) config.remote = "origin"
+        if (config.separator == null) config.separator = "<========>"
     }
 }
