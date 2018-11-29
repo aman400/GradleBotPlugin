@@ -16,18 +16,22 @@ open class FetchRemoteBranchesTask : DefaultTask() {
     @TaskAction
     fun fetchRemoteBranches() {
         config?.git?.credentials?.let { credentialProvider ->
-            Git(project.initRepository()).use { git ->
-                git.fetch().setRemoveDeletedRefs(true).authenticate(credentialProvider).call()
-                val branches = git.branchList().setListMode(ListBranchCommand.ListMode.REMOTE).call()
-                println(config?.separator)
-                branches.map {
-                    it.name.substringAfter("refs/remotes/${config?.git?.remote}/")
-                }.filter {
-                    it != "HEAD"
-                }.forEach {
-                    println(it)
+            if(credentialProvider.isPresent()) {
+                Git(project.initRepository()).use { git ->
+                    git.fetch().setRemoveDeletedRefs(true).authenticate(credentialProvider).call()
+                    val branches = git.branchList().setListMode(ListBranchCommand.ListMode.REMOTE).call()
+                    println(config?.separator)
+                    branches.map {
+                        it.name.substringAfter("refs/remotes/${config?.git?.remote}/")
+                    }.filter {
+                        it != "HEAD"
+                    }.forEach {
+                        println(it)
+                    }
+                    println(config?.separator)
                 }
-                println(config?.separator)
+            } else {
+                logger.error("You need to setup ")
             }
         }
     }
