@@ -1,5 +1,6 @@
 package com.gradlebot.tasks
 
+import com.gradlebot.exception.CredentialsNotFoundException
 import com.gradlebot.extensions.authenticate
 import com.gradlebot.extensions.initRepository
 import com.gradlebot.models.Config
@@ -31,7 +32,7 @@ open class FetchRemoteBranchesTask : DefaultTask() {
                     println(config?.separator)
                 }
             } else {
-                logger.error("You need to setup ")
+                throw CredentialsNotFoundException()
             }
         }
     }
