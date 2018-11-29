@@ -1,3 +1,3 @@
 package com.gradlebot.exception
 
-class CredentialsNotFoundException: Exception("Either set username and password or setup ssh with following block\nbot {\n    config {\n        git {\n            credentials {\n                username = \"<username>\"\n                password = \"<password>\"\n                sshFilePath = \"<ssh file path>\"\n                passphrase = \"<passphrase>\"\n            }\n        }\n    }\n}")
+class CredentialsNotFoundException(message: String): Exception(message)

@@ -11,7 +11,7 @@ import org.eclipse.jgit.transport.UsernamePasswordCredentialsProvider
 @Throws(CredentialsNotFoundException::class)
 fun <C : GitCommand<*>?, T> TransportCommand<C, T>.authenticate(credentialProvider: CredentialProvider): TransportCommand<C, T> {
     if (!credentialProvider.isPresent()) {
-        throw CredentialsNotFoundException()
+        throw CredentialsNotFoundException(credentialProvider.getErrorMessage())
     } else {
 
         if (!credentialProvider.username.isNullOrEmpty()) {

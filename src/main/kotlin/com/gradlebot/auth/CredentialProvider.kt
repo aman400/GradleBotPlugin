@@ -9,4 +9,10 @@ open class CredentialProvider {
     fun isPresent(): Boolean {
         return !username.isNullOrEmpty() || !sshFilePath.isNullOrEmpty()
     }
+
+    fun getErrorMessage(): String {
+        return "Either set username and password or setup ssh with following block\nbot {\n    config {\n        git {\n " +
+                "           credentials {\n                username = \"<username>\"\n                password = \"<password>\"\n          " +
+                "      sshFilePath = \"<ssh file path>\"\n                passphrase = \"<passphrase>\"\n            }\n        }\n    }\n}"
+    }
 }

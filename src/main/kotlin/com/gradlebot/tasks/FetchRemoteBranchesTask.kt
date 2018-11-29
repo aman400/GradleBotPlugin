@@ -32,7 +32,7 @@ open class FetchRemoteBranchesTask : DefaultTask() {
                     println(config?.separator)
                 }
             } else {
-                throw CredentialsNotFoundException()
+                throw CredentialsNotFoundException(credentialProvider.getErrorMessage())
             }
         }
     }
