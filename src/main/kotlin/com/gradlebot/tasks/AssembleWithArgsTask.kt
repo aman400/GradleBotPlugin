@@ -61,12 +61,12 @@ open class AssembleWithArgsTask : BaseAndroidTask() {
     }
 
     @Input
-    override fun getGroup(): String? {
+    override fun getGroup(): String {
         return "Assemble"
     }
 
     @Input
-    override fun getDescription(): String? {
+    override fun getDescription(): String {
         return "Clean, Assemble, Build and Move APK to give path"
     }
 

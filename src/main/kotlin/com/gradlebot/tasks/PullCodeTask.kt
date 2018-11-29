@@ -4,13 +4,12 @@ import com.gradlebot.auth.CredentialProvider
 import com.gradlebot.extensions.authenticate
 import com.gradlebot.extensions.initRepository
 import com.gradlebot.models.Config
-import org.eclipse.jgit.api.CreateBranchCommand
-import org.eclipse.jgit.api.Git
-import org.eclipse.jgit.api.ListBranchCommand
-import org.eclipse.jgit.lib.Ref
 import org.gradle.api.DefaultTask
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.TaskAction
+import org.gradle.internal.impldep.org.eclipse.jgit.api.CreateBranchCommand
+import org.gradle.internal.impldep.org.eclipse.jgit.api.Git
+import org.gradle.internal.impldep.org.eclipse.jgit.api.ListBranchCommand
 
 open class PullCodeTask : DefaultTask() {
     @Input
@@ -92,12 +91,12 @@ open class PullCodeTask : DefaultTask() {
     }
 
     @Input
-    override fun getGroup(): String? {
+    override fun getGroup(): String {
         return "VCS"
     }
 
     @Input
-    override fun getDescription(): String? {
+    override fun getDescription(): String {
         return "Pull latest code from github"
     }
 }

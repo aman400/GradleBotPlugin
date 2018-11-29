@@ -4,11 +4,11 @@ import com.gradlebot.auth.CredentialProvider
 import com.gradlebot.extensions.authenticate
 import com.gradlebot.extensions.initRepository
 import com.gradlebot.models.Config
-import org.eclipse.jgit.api.Git
-import org.eclipse.jgit.api.ListBranchCommand
 import org.gradle.api.DefaultTask
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.TaskAction
+import org.gradle.internal.impldep.org.eclipse.jgit.api.Git
+import org.gradle.internal.impldep.org.eclipse.jgit.api.ListBranchCommand
 
 open class FetchRemoteBranchesTask : DefaultTask() {
     @Input
