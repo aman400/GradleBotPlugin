@@ -1,14 +1,14 @@
 package com.gradlebot.jgit
 
-import org.gradle.internal.impldep.com.jcraft.jsch.JSch
-import org.gradle.internal.impldep.com.jcraft.jsch.JSchException
-import org.gradle.internal.impldep.com.jcraft.jsch.Session
-import org.gradle.internal.impldep.org.eclipse.jgit.api.TransportConfigCallback
-import org.gradle.internal.impldep.org.eclipse.jgit.transport.JschConfigSessionFactory
-import org.gradle.internal.impldep.org.eclipse.jgit.transport.OpenSshConfig
-import org.gradle.internal.impldep.org.eclipse.jgit.transport.SshTransport
-import org.gradle.internal.impldep.org.eclipse.jgit.transport.Transport
-import org.gradle.internal.impldep.org.eclipse.jgit.util.FS
+import com.jcraft.jsch.JSch
+import com.jcraft.jsch.JSchException
+import com.jcraft.jsch.Session
+import org.eclipse.jgit.api.TransportConfigCallback
+import org.eclipse.jgit.transport.JschConfigSessionFactory
+import org.eclipse.jgit.transport.OpenSshConfig
+import org.eclipse.jgit.transport.SshTransport
+import org.eclipse.jgit.transport.Transport
+import org.eclipse.jgit.util.FS
 
 
 class SshTransportConfigCallback(val sshPrivateKeyFile: String?, val passphrase: String?)  : TransportConfigCallback {

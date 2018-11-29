@@ -1,8 +1,8 @@
 package com.gradlebot.extensions
 
+import org.eclipse.jgit.lib.Repository
+import org.eclipse.jgit.storage.file.FileRepositoryBuilder
 import org.gradle.api.Project
-import org.gradle.internal.impldep.org.eclipse.jgit.lib.Repository
-import org.gradle.internal.impldep.org.eclipse.jgit.storage.file.FileRepositoryBuilder
 import java.io.File
 
 fun Project.isAndroidProject(): Boolean {

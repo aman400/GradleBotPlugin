@@ -2,9 +2,9 @@ package com.gradlebot.extensions
 
 import com.gradlebot.auth.CredentialProvider
 import com.gradlebot.jgit.SshTransportConfigCallback
-import org.gradle.internal.impldep.org.eclipse.jgit.api.GitCommand
-import org.gradle.internal.impldep.org.eclipse.jgit.api.TransportCommand
-import org.gradle.internal.impldep.org.eclipse.jgit.transport.UsernamePasswordCredentialsProvider
+import org.eclipse.jgit.api.GitCommand
+import org.eclipse.jgit.api.TransportCommand
+import org.eclipse.jgit.transport.UsernamePasswordCredentialsProvider
 
 
 fun <C : GitCommand<*>?, T> TransportCommand<C, T>.authenticate(credentialProvider: CredentialProvider): TransportCommand<C, T> {
