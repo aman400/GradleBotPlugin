@@ -74,7 +74,7 @@ apply plugin: "com.github.aman400.gradlebot"
     }
 ```
 
-`bot.config.git.credentials` block is to specify the authentication for github repo. Either you can specify username and password authentication or you can use SSH(specify `bot.credentials.passphrase` if any).
+`bot.config.git.credentials` block is to specify the authentication for github repo. Either you can specify username and password authentication or you can use SSH(specify `bot.config.git.credentials.passphrase` if any).
 
 `bot.config.git.branch` config is to specify the branch to checkout to.
 
@@ -90,8 +90,8 @@ apply plugin: "com.github.aman400.gradlebot"
 
 ## Tasks and usage
 
-**pullCode** Task fetches the latest code from the github Repo and checkout to the specified `bot.config.branch`.
-`bot.credentials` are mandatory for fetching the latest code from branch.
+**pullCode** Task fetches the latest code from the github Repo and checkout to the specified `bot.config.git.branch`.
+`bot.config.git.credentials` are mandatory for fetching the latest code from branch.
 ```bash
 ./gradlew pullCode
 ```
@@ -106,7 +106,7 @@ apply plugin: "com.github.aman400.gradlebot"
 ./gradlew fetchRemoteBranches
 ```
 
-**assembleWithArgs** Task depends upon `pullCode`, `cleanOutput` and `assemble` tasks. It generates APK according to specified config and move generated APK to given destination.
+**assembleWithArgs** Task depends upon `cleanOutput` and `assemble` tasks. It generates APK according to specified config and move generated APK to given destination.
 ```bash
 ./gradlew assembleWithArgs
 ```
