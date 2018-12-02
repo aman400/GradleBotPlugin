@@ -27,10 +27,6 @@ dependencies {
     implementation(kotlin("stdlib-jdk8"))
     implementation(gradleApi())
     implementation(Config.Deps.androidGradle)
-    implementation(Config.Deps.retrofit)
-    implementation(Config.Deps.retrofitGson)
-    implementation(Config.Deps.okHttp)
-    implementation(Config.Deps.okHttpLogging)
     implementation(Config.Deps.jgit)
     testImplementation(Config.TestDeps.junit)
 }

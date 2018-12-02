@@ -16,7 +16,7 @@ generate the APK and copy the generated APK to your specified directory in ```bo
 For Gradle version 2.1 and later:
 ```groovy
 plugins {
-  id "com.github.aman400.gradlebot" version "0.1-beta03"
+  id "com.github.aman400.gradlebot" version "0.1-beta04"
 }
 ```
 
@@ -29,7 +29,7 @@ buildscript {
     }
   }
   dependencies {
-    classpath "gradle.plugin.com.github.aman400.gradlebot:gradlebot:0.1-beta03"
+    classpath "gradle.plugin.com.github.aman400.gradlebot:gradlebot:0.1-beta04"
   }
 }
 
@@ -40,40 +40,43 @@ apply plugin: "com.github.aman400.gradlebot"
 ### Configuration
 
 ```groovy
-bot {
-    // for fetching latest data from git repo
-    // (Optional)
-    credentials {
-        sshFilePath = SSH_FILE_PATH
-        passphrase = SSH_PASSPHRASE
-        username = USERNAME
-        password = PASSWORD
+    bot {
+        config {
+            // Destination file path where the app will be copied to             
+            destinationPath = GENERATED_APP_BUILD_PATH // (Optional)
+            
+            // Build type eg. debug/release
+            buildType = ANDROID_BUILD_TYPE // (Optional)
+            
+            // Android product flavour
+            flavour =  ANDROID_PRODUCT_FLAVOUR // (Optional)
+           
+            // This prefix will be appended to app name before copying to destination directory 
+            filePrefix = GENERATED_APP_NAME_PREFIX // (Optional) 
+                       
+            git {
+                // for fetching latest data from git repo
+                // (Optional)
+                credentials {
+                    sshFilePath = SSH_FILE_PATH
+                    passphrase = SSH_PASS
+                    username = USERNAME
+                    password = PASSWORD
+                }
+                
+                // Git branch to be checked out to before build generation
+                branch = GIT_BRANCH
+                
+                // Set git remote repo
+                remote = REMOTE_REPO // (Optional) Default is 'origin'
+            }
+        }
     }
-    config {
-        // Git branch to be checked out to before build generation
-        branch = GIT_BRANCH
-        
-        // Destination file path where the app will be copied to             
-        destinationPath = GENERATED_APP_BUILD_PATH // (Optional)
-        
-        // Build type eg. debug/release
-        buildType = ANDROID_BUILD_TYPE // (Optional)
-        
-        // Android product flavour
-        flavour =  ANDROID_PRODUCT_FLAVOUR // (Optional)
-        
-        // This prefix will be appended to app name before copying to destination directory
-        filePrefix = GENERATED_APP_NAME_PREFIX // (Optional) 
-        
-        // Set git remote repo
-        remote = REMOTE_REPO // (Optional) Default is 'origin'
-    }
-}
 ```
 
-`bot.credentials` block is to specify the authentication for github repo. Either you can specify username and password authentication or you can use SSH(specify `bot.credentials.passphrase` if any).
+`bot.config.git.credentials` block is to specify the authentication for github repo. Either you can specify username and password authentication or you can use SSH(specify `bot.credentials.passphrase` if any).
 
-`bot.config.branch` config is to specify the branch to checkout to.
+`bot.config.git.branch` config is to specify the branch to checkout to.
 
 `bot.config.destinationPath` config is to specify the destination path to copy generate APK to.
 
@@ -83,7 +86,7 @@ bot {
 
 `bot.config.filePrefix` config is to prepend prefix to generated APK.
 
-`bot.config.remote` config is to set the git remote. Default is `origin`.
+`bot.config.git.remote` config is to set the git remote. Default is `origin`.
 
 ## Tasks and usage
 
