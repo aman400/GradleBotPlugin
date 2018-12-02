@@ -25,16 +25,13 @@ open class GradleBotPlugin : Plugin<Project> {
                 }
                 create("fetchRemoteBranches", FetchRemoteBranchesTask::class.java) {
                     it.config = extension.config
-                    it.credentials = extension.credentials
                 }
                 val pullCodeTask = create("pullCode", PullCodeTask::class.java) {
-                    it.credentialProvider = extension.credentials
-                    it.config = extension.config
+                    it.gitConfig = extension.config.git
                 }
                 val cleanOutputTask = create("cleanOutput", CleanOutputTask::class.java)
 
                 val assembleWithArgsTask = create("assembleWithArgs", AssembleWithArgsTask::class.java) {
-                    it.credentialProvider = extension.credentials
                     it.pullCodeTask = pullCodeTask
                     it.config = extension.config
                     it.cleanOutputTask = cleanOutputTask

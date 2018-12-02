@@ -1,6 +1,5 @@
 package com.gradlebot.tasks
 
-import com.gradlebot.auth.CredentialProvider
 import com.gradlebot.models.Config
 import org.gradle.api.plugins.BasePlugin
 import org.gradle.api.tasks.CacheableTask
@@ -19,8 +18,6 @@ open class AssembleWithArgsTask : BaseAndroidTask() {
     @Internal
     var defaultBuildType: String? = null
 
-    @Input
-    lateinit var credentialProvider: CredentialProvider
     @Internal
     lateinit var pullCodeTask: PullCodeTask
     @Internal
@@ -61,12 +58,12 @@ open class AssembleWithArgsTask : BaseAndroidTask() {
     }
 
     @Input
-    override fun getGroup(): String? {
+    override fun getGroup(): String {
         return "Assemble"
     }
 
     @Input
-    override fun getDescription(): String? {
+    override fun getDescription(): String {
         return "Clean, Assemble, Build and Move APK to give path"
     }
 
@@ -88,9 +85,7 @@ open class AssembleWithArgsTask : BaseAndroidTask() {
             dependsOn(buildTask)
             dependsOn(assembleTask)
             dependsOn(cleanOutputTask)
-            dependsOn(pullCodeTask)
 
-            cleanOutputTask.mustRunAfter(pullCodeTask)
             buildTask?.mustRunAfter(cleanOutputTask)
             assembleTask?.mustRunAfter(buildTask)
         }

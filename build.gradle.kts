@@ -4,7 +4,7 @@ plugins {
     groovy
     java
     `java-gradle-plugin`
-    kotlin("jvm") version "1.3.0"
+    kotlin("jvm") version "1.3.10"
     id("com.gradle.plugin-publish") version "0.10.0"
 }
 
@@ -23,12 +23,12 @@ repositories {
 version = VERSION_NAME
 
 dependencies {
-    compile(localGroovy())
-    compile(kotlin("stdlib-jdk8"))
-    compile(gradleApi())
-    compile("com.android.tools.build:gradle:1.3.0")
-    implementation(group="org.eclipse.jgit", name="org.eclipse.jgit", version = "5.1.3.201810200350-r")
-    testCompile("junit", "junit", "4.12")
+    implementation(localGroovy())
+    implementation(kotlin("stdlib-jdk8"))
+    implementation(gradleApi())
+    implementation(Config.Deps.androidGradle)
+    implementation(Config.Deps.jgit)
+    testImplementation(Config.TestDeps.junit)
 }
 
 gradlePlugin {

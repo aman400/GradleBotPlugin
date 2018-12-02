@@ -26,12 +26,12 @@ open class BuildVariantsTask : BaseAndroidTask() {
     }
 
     @Input
-    override fun getGroup(): String? {
+    override fun getGroup(): String {
         return "Config"
     }
 
     @Input
-    override fun getDescription(): String? {
+    override fun getDescription(): String {
         return "Get all the Android project build types"
     }
 

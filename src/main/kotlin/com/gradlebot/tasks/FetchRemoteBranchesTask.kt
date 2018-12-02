@@ -1,6 +1,6 @@
 package com.gradlebot.tasks
 
-import com.gradlebot.auth.CredentialProvider
+import com.gradlebot.exception.CredentialsNotFoundException
 import com.gradlebot.extensions.authenticate
 import com.gradlebot.extensions.initRepository
 import com.gradlebot.models.Config
@@ -14,24 +14,25 @@ open class FetchRemoteBranchesTask : DefaultTask() {
     @Input
     var config: Config? = null
 
-    @Input
-    var credentials: CredentialProvider? = null
-
     @TaskAction
     fun fetchRemoteBranches() {
-        credentials?.let {credentialProvider ->
-            Git(project.initRepository()).use { git ->
-                git.fetch().setRemoveDeletedRefs(true).authenticate(credentialProvider).call()
-                val branches = git.branchList().setListMode(ListBranchCommand.ListMode.REMOTE).call()
-                println(config?.separator)
-                branches.map {
-                    it.name.substringAfter("refs/remotes/${config?.remote}/")
-                }.filter {
-                    it != "HEAD"
-                }.forEach {
-                    println(it)
+        config?.git?.credentials?.let { credentialProvider ->
+            if(credentialProvider.isPresent()) {
+                Git(project.initRepository()).use { git ->
+                    git.fetch().setRemoveDeletedRefs(true).authenticate(credentialProvider).call()
+                    val branches = git.branchList().setListMode(ListBranchCommand.ListMode.REMOTE).call()
+                    println(config?.separator)
+                    branches.map {
+                        it.name.substringAfter("refs/remotes/${config?.git?.remote}/")
+                    }.filter {
+                        it != "HEAD"
+                    }.forEach {
+                        println(it)
+                    }
+                    println(config?.separator)
                 }
-                println(config?.separator)
+            } else {
+                throw CredentialsNotFoundException(credentialProvider.getErrorMessage())
             }
         }
     }

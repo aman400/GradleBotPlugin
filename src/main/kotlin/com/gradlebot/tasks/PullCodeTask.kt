@@ -4,32 +4,29 @@ import com.gradlebot.auth.CredentialProvider
 import com.gradlebot.extensions.authenticate
 import com.gradlebot.extensions.initRepository
 import com.gradlebot.models.Config
+import com.gradlebot.models.GitConfig
 import org.eclipse.jgit.api.CreateBranchCommand
 import org.eclipse.jgit.api.Git
 import org.eclipse.jgit.api.ListBranchCommand
-import org.eclipse.jgit.lib.Ref
 import org.gradle.api.DefaultTask
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.TaskAction
 
 open class PullCodeTask : DefaultTask() {
-    @Input
-    var credentialProvider: CredentialProvider? = null
 
     @Input
-    var config: Config? = null
+    var gitConfig: GitConfig? = null
 
     @TaskAction
     fun pullCode() {
-        credentialProvider?.let { credentials ->
-            if (credentials.isPresent()) {
-                if (!config?.branch.isNullOrEmpty()) {
-                    config?.let { config ->
+        gitConfig?.let { config ->
+            if (config.credentials.isPresent()) {
+                if (!config.branch.isNullOrEmpty()) {
                         Git(project.initRepository()).use { git ->
 
                             git.fetch().setCheckFetchedObjects(true)
                                 .setRemoveDeletedRefs(true)
-                                .authenticate(credentials).call()
+                                .authenticate(config.credentials).call()
                             logger.quiet("Fetched all branches")
 
                             val localBranch = git.branchList().call().filter {
@@ -40,7 +37,7 @@ open class PullCodeTask : DefaultTask() {
 
                             if (localBranch != null) {
                                 git.checkout().setName(config.branch).setCreateBranch(false).call()
-                                if (git.pull().authenticate(credentials).call().isSuccessful) {
+                                if (git.pull().authenticate(config.credentials).call().isSuccessful) {
                                     logger.quiet("Pulled latest code")
                                 }
                             } else {
@@ -51,11 +48,10 @@ open class PullCodeTask : DefaultTask() {
                                 }.firstOrNull()
 
                                 if (remoteBranch != null) {
-                                    fetchAndCheckoutRemoteBranch(git, config, credentials)
+                                    fetchAndCheckoutRemoteBranch(git, config, config.credentials)
                                 }
                             }
                         }
-                    } ?: logger.warn("branch not specified")
                 } else {
                     logger.warn("branch not specified")
                 }
@@ -65,17 +61,17 @@ open class PullCodeTask : DefaultTask() {
         }
     }
 
-    private fun fetchAndCheckoutRemoteBranch(git: Git, config: Config, credentialProvider: CredentialProvider) {
-        checkoutRemoteBranch(git, config)
+    private fun fetchAndCheckoutRemoteBranch(git: Git, gitConfig: GitConfig, credentialProvider: CredentialProvider) {
+        checkoutRemoteBranch(git, gitConfig)
 
-        if (pullRemoteCode(git, config.branch!!, credentialProvider)) {
+        if (pullRemoteCode(git, gitConfig.branch!!, credentialProvider)) {
             logger.quiet("Pulled latest code from remote branch")
         } else {
             logger.quiet("Unable to pull latest code from branch")
         }
     }
 
-    private fun checkoutRemoteBranch(git: Git, config: Config) {
+    private fun checkoutRemoteBranch(git: Git, config: GitConfig) {
         git.checkout()
             .setName(config.branch)
             .setCreateBranch(true)
@@ -92,12 +88,12 @@ open class PullCodeTask : DefaultTask() {
     }
 
     @Input
-    override fun getGroup(): String? {
+    override fun getGroup(): String {
         return "VCS"
     }
 
     @Input
-    override fun getDescription(): String? {
+    override fun getDescription(): String {
         return "Pull latest code from github"
     }
 }
