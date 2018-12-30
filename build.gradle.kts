@@ -4,7 +4,7 @@ plugins {
     groovy
     java
     `java-gradle-plugin`
-    kotlin("jvm") version "1.3.10"
+    kotlin("jvm") version "1.3.11"
     id("com.gradle.plugin-publish") version "0.10.0"
 }
 
@@ -17,6 +17,7 @@ val POM_SCM_URL: String by project
 val VERSION_NAME: String by project
 
 repositories {
+    google()
     mavenCentral()
 }
 
