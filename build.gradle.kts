@@ -4,8 +4,8 @@ plugins {
     groovy
     java
     `java-gradle-plugin`
-    kotlin("jvm") version "1.3.11"
-    id("com.gradle.plugin-publish") version "0.10.0"
+    kotlin("jvm") version "1.3.21"
+    id("com.gradle.plugin-publish") version "0.10.1"
 }
 
 val POM_ARTIFACT_ID: String by project

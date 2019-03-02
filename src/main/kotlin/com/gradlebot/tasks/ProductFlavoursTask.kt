@@ -3,6 +3,7 @@ package com.gradlebot.tasks
 import com.android.build.gradle.BaseExtension
 import com.android.build.gradle.internal.dsl.ProductFlavor
 import com.gradlebot.models.Config
+import com.gradlebot.models.UserConfig
 import org.gradle.api.NamedDomainObjectContainer
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.Internal
@@ -11,6 +12,8 @@ import org.gradle.api.tasks.TaskAction
 open class ProductFlavoursTask: BaseAndroidTask() {
     @Internal
     var productFlavours: NamedDomainObjectContainer<ProductFlavor>? = null
+    @Input
+    var userConfig: UserConfig? = null
     @Input
     var config: Config? = null
 

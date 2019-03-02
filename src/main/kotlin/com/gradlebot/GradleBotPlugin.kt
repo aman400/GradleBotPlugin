@@ -18,22 +18,29 @@ open class GradleBotPlugin : Plugin<Project> {
         if(hasAndroidProject) {
             with(project.tasks) {
                 val buildVariantsTask = create("getBuildVariants", BuildVariantsTask::class.java) {
+                    it.userConfig = extension.userConfig
                     it.config = extension.config
                 }
                 val flavoursTask = create("getProductFlavours", ProductFlavoursTask::class.java) {
+                    it.userConfig = extension.userConfig
                     it.config = extension.config
                 }
                 create("fetchRemoteBranches", FetchRemoteBranchesTask::class.java) {
+                    it.userConfig = extension.userConfig
                     it.config = extension.config
                 }
                 val pullCodeTask = create("pullCode", PullCodeTask::class.java) {
-                    it.gitConfig = extension.config.git
+                    it.gitConfig = extension.userConfig.git
                 }
                 val cleanOutputTask = create("cleanOutput", CleanOutputTask::class.java)
 
+                create("resetBranch", ResetBranchTask::class.java) {
+                    it.config = extension.userConfig.git
+                }
+
                 val assembleWithArgsTask = create("assembleWithArgs", AssembleWithArgsTask::class.java) {
                     it.pullCodeTask = pullCodeTask
-                    it.config = extension.config
+                    it.userConfig = extension.userConfig
                     it.cleanOutputTask = cleanOutputTask
                 }
 

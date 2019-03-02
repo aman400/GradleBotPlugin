@@ -3,6 +3,7 @@ package com.gradlebot.tasks
 import com.android.build.gradle.BaseExtension
 import com.android.build.gradle.internal.dsl.BuildType
 import com.gradlebot.models.Config
+import com.gradlebot.models.UserConfig
 import org.gradle.api.NamedDomainObjectContainer
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.Internal
@@ -12,6 +13,8 @@ open class BuildVariantsTask : BaseAndroidTask() {
 
     @Internal
     var buildTypes: NamedDomainObjectContainer<BuildType>? = null
+    @Input
+    var userConfig: UserConfig? = null
     @Input
     var config: Config? = null
 

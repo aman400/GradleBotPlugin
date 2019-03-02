@@ -3,7 +3,6 @@ package com.gradlebot.tasks
 import com.gradlebot.auth.CredentialProvider
 import com.gradlebot.extensions.authenticate
 import com.gradlebot.extensions.initRepository
-import com.gradlebot.models.Config
 import com.gradlebot.models.GitConfig
 import org.eclipse.jgit.api.CreateBranchCommand
 import org.eclipse.jgit.api.Git
