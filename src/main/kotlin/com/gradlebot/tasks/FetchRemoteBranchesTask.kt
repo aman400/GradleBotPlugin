@@ -20,15 +20,21 @@ open class FetchRemoteBranchesTask : DefaultTask() {
     @TaskAction
     fun fetchRemoteBranches() {
         userConfig?.git?.credentials?.let { credentialProvider ->
-            if(credentialProvider.isPresent()) {
+            if (credentialProvider.isPresent()) {
                 Git(project.initRepository()).use { git ->
-                    git.fetch().setRemoveDeletedRefs(true).authenticate(credentialProvider).call()
+                    git.fetch().setRemote(userConfig?.git?.remote).setRemoveDeletedRefs(true)
+                        .authenticate(credentialProvider).call()
                     val branches = git.branchList().setListMode(ListBranchCommand.ListMode.REMOTE).call()
                     println(config?.separator)
-                    branches.map {
-                        it.name.substringAfter("refs/remotes/${userConfig?.git?.remote}/")
-                    }.filter {
-                        it != "HEAD"
+
+                    // Filter branches of selected remote
+                    branches.filter { ref ->
+                        userConfig?.git?.remote?.let { remote ->
+                            ref.name.contains(remote)
+                        } ?: true
+                    }.map {
+                        // Strip off remote from branch name
+                        it.name.substringAfter("refs/remotes/${userConfig?.git?.remote ?: "origin"}/")
                     }.forEach {
                         println(it)
                     }

@@ -23,7 +23,7 @@ open class PullCodeTask : DefaultTask() {
                 if (!config.branch.isNullOrEmpty()) {
                         Git(project.initRepository()).use { git ->
 
-                            git.fetch().setCheckFetchedObjects(true)
+                            git.fetch().setRemote(gitConfig?.remote).setCheckFetchedObjects(true)
                                 .setRemoveDeletedRefs(true)
                                 .authenticate(config.credentials).call()
                             logger.quiet("Fetched all branches")

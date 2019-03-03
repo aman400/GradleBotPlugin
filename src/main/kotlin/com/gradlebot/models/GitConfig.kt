@@ -5,7 +5,7 @@ import org.gradle.api.Action
 import org.gradle.api.Project
 import javax.inject.Inject
 
-open class GitConfig @Inject constructor(project: Project) {
+open class GitConfig @Inject constructor(val project: Project) {
 
     // specify the remote(eg. origin)
     var remote: String? = null
