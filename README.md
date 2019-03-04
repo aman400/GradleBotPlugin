@@ -16,7 +16,7 @@ generate the APK and copy the generated APK to your specified directory in ```bo
 For Gradle version 2.1 and later:
 ```groovy
 plugins {
-  id "com.github.aman400.gradlebot" version "0.1-beta04"
+  id "com.github.aman400.gradlebot" version "0.2"
 }
 ```
 
@@ -29,7 +29,7 @@ buildscript {
     }
   }
   dependencies {
-    classpath "gradle.plugin.com.github.aman400.gradlebot:gradlebot:0.1-beta04"
+    classpath "gradle.plugin.com.github.aman400.gradlebot:gradlebot:0.2"
   }
 }
 
@@ -39,42 +39,63 @@ apply plugin: "com.github.aman400.gradlebot"
 
 ### Configuration
 
-```groovy
-    bot {
-        config {
-            // Destination file path where the app will be copied to             
-            destinationPath = GENERATED_APP_BUILD_PATH // (Optional)
-            
-            // Build type eg. debug/release
-            buildType = ANDROID_BUILD_TYPE // (Optional)
-            
-            // Android product flavour
-            flavour =  ANDROID_PRODUCT_FLAVOUR // (Optional)
-           
-            // This prefix will be appended to app name before copying to destination directory 
-            filePrefix = GENERATED_APP_NAME_PREFIX // (Optional) 
-                       
-            git {
-                // for fetching latest data from git repo
-                // (Optional)
-                credentials {
-                    sshFilePath = SSH_FILE_PATH
-                    passphrase = SSH_PASS
-                    username = USERNAME
-                    password = PASSWORD
-                }
-                
-                // Git branch to be checked out to before build generation
-                branch = GIT_BRANCH
-                
-                // Set git remote repo
-                remote = REMOTE_REPO // (Optional) Default is 'origin'
-            }
-        }
-    }
+Add `gradlebot.properties` file in the root folder of your project with following configuration:
+
+```properties
+#Set credentials for fetching latest data from git repo
+git.ssh.path=YOUR_SSH_FILE_PATH
+git.ssh.passphrase=YOUR_SSH_PASSPHRASE
+git.username=GIT_USERNAME
+git.password=GIT_PASSWORD
+
+#Default branch
+git.branch.default=YOUR_DEFAULT_BRANCH
+
+#(Optional) Default is 'origin'
+git.remote=REPO_ORIGIN
 ```
 
-`bot.config.git.credentials` block is to specify the authentication for github repo. Either you can specify username and password authentication or you can use SSH(specify `bot.config.git.credentials.passphrase` if any).
+`git.ssh.path` is the path for ssh file.
+
+`git.ssh.passphrase` is the passphrase for ssh.
+
+`git.username` is the git remote repository username.
+
+`git.password` is the git remote repository password.
+
+`git.branch.default` is the default branch that is checked out when performing `resetBranch` task.
+
+`git.remote` is to set the git remote. Default is `origin`.
+
+
+Either set `git.ssh.path` and `git.ssh.passphrase` when using ssh as transfer protocol
+or set `git.username` and `git.password` when using https as transfer protocol
+
+
+***In your `build.gradle` file add following config:***
+
+```groovy
+bot {
+    config {
+        // Destination file path where the app will be copied to             
+        destinationPath = GENERATED_APP_BUILD_PATH // (Optional)
+        
+        // Build type eg. debug/release
+        buildType = ANDROID_BUILD_TYPE // (Optional)
+        
+        // Android product flavour
+        flavour =  ANDROID_PRODUCT_FLAVOUR // (Optional)
+       
+        // This prefix will be appended to app name before copying to destination directory 
+        filePrefix = GENERATED_APP_NAME_PREFIX // (Optional) 
+                   
+        git {
+            // Git branch to be checked out to before build generation
+            branch = GIT_BRANCH
+        }
+    }
+}
+```
 
 `bot.config.git.branch` config is to specify the branch to checkout to.
 
@@ -85,8 +106,6 @@ apply plugin: "com.github.aman400.gradlebot"
 `bot.config.flavour` config is to specify android build flavour you want to build.
 
 `bot.config.filePrefix` config is to prepend prefix to generated APK.
-
-`bot.config.git.remote` config is to set the git remote. Default is `origin`.
 
 ## Tasks and usage
 
@@ -110,3 +129,18 @@ apply plugin: "com.github.aman400.gradlebot"
 ```bash
 ./gradlew assembleWithArgs
 ```
+
+**resetBranch** Task resets the current branch to `git.branch.default` and deletes the current local branch
+```bash
+./gradlew resetBranch
+```
+
+
+**When working with Github:**
+
+Github Settings allow to create OAuth token. These can also be used to authenticate HTTPS connections. Use OAuth token as username and "" as password. 
+
+**When working with Gitlab:**
+
+GitLab Profile Settings allow to create Personal Access Tokens. These can also be used to authenticate HTTPS connections. 
+Access tokens can have an expiration date or can be revoked manually at any time.
