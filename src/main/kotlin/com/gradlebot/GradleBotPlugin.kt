@@ -11,11 +11,12 @@ open class GradleBotPlugin : Plugin<Project> {
             create("bot", GradleBotExtension::class.java, project)
         }
 
-        val hasAndroidProject = project.isAndroidProject() || (!project.subprojects.isEmpty() && project.subprojects.any {
-            it.isAndroidProject()
-        })
+        val hasAndroidProject =
+            project.isAndroidProject() || (!project.subprojects.isEmpty() && project.subprojects.any {
+                it.isAndroidProject()
+            })
 
-        if(hasAndroidProject) {
+        if (hasAndroidProject) {
             with(project.tasks) {
                 val buildVariantsTask = create("getBuildVariants", BuildVariantsTask::class.java) {
                     it.userConfig = extension.userConfig

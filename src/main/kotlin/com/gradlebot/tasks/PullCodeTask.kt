@@ -21,36 +21,37 @@ open class PullCodeTask : DefaultTask() {
         gitConfig?.let { config ->
             if (config.credentials.isPresent()) {
                 if (!config.branch.isNullOrEmpty()) {
-                        Git(project.initRepository()).use { git ->
+                    Git(project.initRepository()).use { git ->
 
-                            git.fetch().setRemote(gitConfig?.remote).setCheckFetchedObjects(true)
-                                .setRemoveDeletedRefs(true)
-                                .authenticate(config.credentials).call()
-                            logger.quiet("Fetched all branches")
+                        git.fetch().setRemote(gitConfig?.remote).setCheckFetchedObjects(true)
+                            .setRemoveDeletedRefs(true)
+                            .authenticate(config.credentials).call()
+                        logger.quiet("Fetched all branches")
 
-                            val localBranch = git.branchList().call().filter {
-                                it.name.substringAfter("refs/heads/") == config.branch
-                            }.map {
-                                it.name.substringAfter("refs/heads/")
-                            }.firstOrNull()
+                        val localBranch = git.branchList().call().filter {
+                            it.name.substringAfter("refs/heads/") == config.branch
+                        }.map {
+                            it.name.substringAfter("refs/heads/")
+                        }.firstOrNull()
 
-                            if (localBranch != null) {
-                                git.checkout().setName(config.branch).setCreateBranch(false).call()
-                                if (git.pull().authenticate(config.credentials).call().isSuccessful) {
-                                    logger.quiet("Pulled latest code")
-                                }
-                            } else {
-                                val remoteBranch = git.branchList().setListMode(ListBranchCommand.ListMode.REMOTE).call().filter {
+                        if (localBranch != null) {
+                            git.checkout().setName(config.branch).setCreateBranch(false).call()
+                            if (git.pull().authenticate(config.credentials).call().isSuccessful) {
+                                logger.quiet("Pulled latest code")
+                            }
+                        } else {
+                            val remoteBranch =
+                                git.branchList().setListMode(ListBranchCommand.ListMode.REMOTE).call().filter {
                                     it.name.substringAfter("refs/remotes/${config.remote}/") == config.branch
                                 }.map {
                                     it.name.substringAfter("refs/remotes/${config.remote}/")
                                 }.firstOrNull()
 
-                                if (remoteBranch != null) {
-                                    fetchAndCheckoutRemoteBranch(git, config, config.credentials)
-                                }
+                            if (remoteBranch != null) {
+                                fetchAndCheckoutRemoteBranch(git, config, config.credentials)
                             }
                         }
+                    }
                 } else {
                     logger.warn("branch not specified")
                 }
