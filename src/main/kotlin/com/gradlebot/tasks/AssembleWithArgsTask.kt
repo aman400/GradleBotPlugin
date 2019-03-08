@@ -64,7 +64,7 @@ open class AssembleWithArgsTask : BaseAndroidTask() {
 
     @Input
     override fun getDescription(): String {
-        return "Clean, Assemble, Build and Move APK to give path"
+        return "Clean, Assemble, Build and Move APK to given path"
     }
 
     override fun evaluateTask() {

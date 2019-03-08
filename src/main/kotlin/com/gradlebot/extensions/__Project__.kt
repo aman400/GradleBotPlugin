@@ -33,6 +33,7 @@ fun Project.getProjectProperties(): Properties {
     } catch (fileNotFoundException: FileNotFoundException) {
         logger.warn("gradlebot.properties file not found in root project", fileNotFoundException)
     }
+    gradlebotProperties.putAll(project.properties)
 
     return gradlebotProperties
 }

@@ -17,27 +17,27 @@ open class GradleBotExtension @Inject constructor(val project: Project) {
         action.execute(userConfig)
         val projectProperties = project.getProjectProperties()
 
-        if(!userConfig.git.credentials.isPresent()) {
-            if (projectProperties.containsKey("git.ssh.path")) {
-                userConfig.git.credentials.sshFilePath = projectProperties.getProperty("git.ssh.path")
+        if (!userConfig.git.credentials.isPresent()) {
+            if (projectProperties.containsKey("gradlebot.git.ssh.path")) {
+                userConfig.git.credentials.sshFilePath = projectProperties.getProperty("gradlebot.git.ssh.path")
             }
 
-            if (projectProperties.containsKey("git.ssh.passphrase")) {
-                userConfig.git.credentials.passphrase = projectProperties.getProperty("git.ssh.passphrase")
+            if (projectProperties.containsKey("gradlebot.git.ssh.passphrase")) {
+                userConfig.git.credentials.passphrase = projectProperties.getProperty("gradlebot.git.ssh.passphrase")
             }
 
-            if (projectProperties.containsKey("git.username")) {
-                userConfig.git.credentials.username = projectProperties.getProperty("git.username")
+            if (projectProperties.containsKey("gradlebot.git.username")) {
+                userConfig.git.credentials.username = projectProperties.getProperty("gradlebot.git.username")
             }
 
-            if (projectProperties.containsKey("git.password")) {
-                userConfig.git.credentials.password = projectProperties.getProperty("git.password")
+            if (projectProperties.containsKey("gradlebot.git.password")) {
+                userConfig.git.credentials.password = projectProperties.getProperty("gradlebot.git.password")
             }
         }
 
-        if(userConfig.git.remote == null) {
-            if(projectProperties.containsKey("git.remote")) {
-                userConfig.git.remote = projectProperties.getProperty("git.remote")
+        if (userConfig.git.remote == null) {
+            if (projectProperties.containsKey("gradlebot.git.remote")) {
+                userConfig.git.remote = projectProperties.getProperty("gradlebot.git.remote")
             } else {
                 project.initRepository()?.let {
                     val storedConfig = it.config
@@ -46,9 +46,31 @@ open class GradleBotExtension @Inject constructor(val project: Project) {
                 }
             }
         }
-        if(userConfig.git.defaultBranch == null) {
-            userConfig.git.defaultBranch = if(projectProperties.containsKey("git.branch.default")) {
-                projectProperties.getProperty("git.branch.default")
+
+        if (userConfig.git.branch == null) {
+            if (projectProperties.containsKey("gradlebot.branch.name")) {
+                userConfig.git.branch = projectProperties.getProperty("gradlebot.branch.name")
+            }
+        }
+
+        if (userConfig.buildType == null) {
+            if (projectProperties.containsKey("gradlebot.build.type")) {
+                userConfig.buildType = projectProperties.getProperty("gradlebot.build.type")
+            }
+        }
+        if(userConfig.flavour == null) {
+            if(projectProperties.containsKey("gradlebot.build.flavour")) {
+                userConfig.flavour = projectProperties.getProperty("gradlebot.build.flavour")
+            }
+        }
+        if(userConfig.filePrefix == null) {
+            if(projectProperties.containsKey("gradlebot.file.prefix")) {
+                userConfig.filePrefix = projectProperties.getProperty("gradlebot.file.prefix")
+            }
+        }
+        if (userConfig.git.defaultBranch == null) {
+            userConfig.git.defaultBranch = if (projectProperties.containsKey("gradlebot.git.branch.default")) {
+                projectProperties.getProperty("gradlebot.git.branch.default")
             } else {
                 "master"
             }
