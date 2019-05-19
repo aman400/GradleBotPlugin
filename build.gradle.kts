@@ -4,7 +4,7 @@ plugins {
     groovy
     java
     `java-gradle-plugin`
-    kotlin("jvm") version "1.3.21"
+    kotlin("jvm") version "1.3.31"
     id("com.gradle.plugin-publish") version "0.10.1"
 }
 

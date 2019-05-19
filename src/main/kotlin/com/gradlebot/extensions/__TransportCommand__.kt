@@ -18,7 +18,7 @@ fun <C : GitCommand<*>?, T> TransportCommand<C, T>.authenticate(credentialProvid
             setCredentialsProvider(
                 UsernamePasswordCredentialsProvider(
                     credentialProvider.username,
-                    credentialProvider.password
+                    credentialProvider.password ?: ""
                 )
             )
         } else {

@@ -42,7 +42,13 @@ open class GradleBotExtension @Inject constructor(val project: Project) {
                 project.initRepository()?.let {
                     val storedConfig = it.config
                     val remotes = storedConfig.getSubsections("remote")
-                    userConfig.git.remote = remotes.firstOrNull() ?: "origin"
+                    userConfig.git.remote = remotes.firstOrNull { remote ->
+                        if(userConfig.git.credentials.username != null) {
+                            storedConfig.getString("remote", remote, "url").startsWith("http")
+                        } else {
+                            storedConfig.getString("remote", remote, "url").startsWith("git")
+                        }
+                    } ?: "origin"
                 }
             }
         }

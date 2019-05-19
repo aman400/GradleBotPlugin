@@ -30,7 +30,7 @@ open class FetchRemoteBranchesTask : DefaultTask() {
                     // Filter branches of selected remote
                     branches.filter { ref ->
                         userConfig?.git?.remote?.let { remote ->
-                            ref.name.contains(remote)
+                            ref.name.contains(remote) && !ref.name.contains("HEAD", ignoreCase = true)
                         } ?: true
                     }.map {
                         // Strip off remote from branch name
