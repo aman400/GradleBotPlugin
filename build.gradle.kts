@@ -19,6 +19,7 @@ val VERSION_NAME: String by project
 repositories {
     google()
     mavenCentral()
+    jcenter()
 }
 
 version = VERSION_NAME

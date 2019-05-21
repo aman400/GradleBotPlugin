@@ -7,7 +7,9 @@ import com.gradlebot.models.GitConfig
 import org.eclipse.jgit.api.CreateBranchCommand
 import org.eclipse.jgit.api.Git
 import org.eclipse.jgit.api.ListBranchCommand
+import org.eclipse.jgit.transport.TagOpt
 import org.gradle.api.DefaultTask
+import org.gradle.api.logging.LogLevel
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.TaskAction
 
@@ -25,6 +27,7 @@ open class PullCodeTask : DefaultTask() {
 
                         git.fetch().setRemote(gitConfig?.remote).setCheckFetchedObjects(true)
                             .setRemoveDeletedRefs(true)
+                            .setTagOpt(TagOpt.FETCH_TAGS)
                             .authenticate(config.credentials).call()
                         logger.quiet("Fetched all branches")
 
@@ -35,20 +38,39 @@ open class PullCodeTask : DefaultTask() {
                         }.firstOrNull()
 
                         if (localBranch != null) {
-                            git.checkout().setName(config.branch).setCreateBranch(false).call()
-                            if (git.pull().authenticate(config.credentials).call().isSuccessful) {
+                            git.checkout().setName(localBranch).call()
+                            if (git.pull().setRemoteBranchName(localBranch)
+                                    .authenticate(config.credentials).call().isSuccessful) {
                                 logger.quiet("Pulled latest code")
+                            } else {
+                                logger.warn("Unable to pull code")
                             }
                         } else {
-                            val remoteBranch =
-                                git.branchList().setListMode(ListBranchCommand.ListMode.REMOTE).call().filter {
-                                    it.name.substringAfter("refs/remotes/${config.remote}/") == config.branch
-                                }.map {
-                                    it.name.substringAfter("refs/remotes/${config.remote}/")
-                                }.firstOrNull()
+                            val localTag = git.tagList().call().firstOrNull { ref ->
+                                config.branch?.let {
+                                    ref.name.endsWith(it, true)
+                                } ?: false
+                            }
+                            if(localTag != null) {
+                                try {
+                                    git.checkout().setCreateBranch(false).setName(config.branch)
+                                        .setStartPoint(localTag.name).call()
+                                } catch (exception: Exception) {
+                                    exception.printStackTrace()
+                                }
+                            } else {
+                                val remoteBranch =
+                                    git.branchList().setListMode(ListBranchCommand.ListMode.REMOTE).call().filter {
+                                        it.name.substringAfter("refs/remotes/${config.remote}/") == config.branch
+                                    }.map {
+                                        it.name.substringAfter("refs/remotes/${config.remote}/")
+                                    }.firstOrNull()
 
-                            if (remoteBranch != null) {
-                                fetchAndCheckoutRemoteBranch(git, config, config.credentials)
+                                if (remoteBranch != null) {
+                                    fetchAndCheckoutRemoteBranch(git, config, config.credentials)
+                                } else {
+                                    null
+                                }
                             }
                         }
                     }

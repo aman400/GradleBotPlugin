@@ -5,7 +5,7 @@ object Config {
         const val retrofitVersion = "2.5.0"
         const val okHttpVersion = "3.12.1"
         const val androidGradleVersion = "3.5.0-beta01"
-        const val jgitVersion = "5.2.0.201812061821-r"
+        const val jgitVersion = "5.3.1.201904271842-r"
         const val junitVersion = "4.12"
     }
 

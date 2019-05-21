@@ -18,6 +18,10 @@ open class UserConfig @Inject constructor(var project: Project) {
     // filePrefix is appended before the file name
     var filePrefix: String? = null
 
+    @Deprecated("Need not to pass this field explicitly. This value of this field will be ignored.",
+        ReplaceWith("This field is automatically parsed from gradle.properties"), level = DeprecationLevel.WARNING)
+    var separator: String? = null
+
     // Git credentials and userConfig
     val git: GitConfig = project.objects.newInstance(GitConfig::class.java, project)
 
