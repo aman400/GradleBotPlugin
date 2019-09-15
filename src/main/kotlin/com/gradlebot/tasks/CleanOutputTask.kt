@@ -33,7 +33,7 @@ open class CleanOutputTask : BaseAndroidTask() {
         if(project.isAndroidProject()) {
             buildDirs.add(project.buildDir.path)
         }
-        if(!project.subprojects.isEmpty()) {
+        if(project.subprojects.isNotEmpty()) {
             project.subprojects.forEach {
                 if(it.isAndroidProject() || it.isAndroidLibrary()) {
                     buildDirs.add(it.buildDir.path)
